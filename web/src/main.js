@@ -25,7 +25,7 @@ import * as LoadingService from './services/loadingservice';
 import thirdPartyServices from './services/thirdparty';
 
 // Utils
-import { getCurrentZoneData, getSelectedZoneExchangeKeys } from './selectors';
+import { getCurrentZoneData, getSelectedZoneExchangeKeys, getCarbonIntensity } from './selectors';
 import { getCo2Scale } from './helpers/scales';
 
 import {
@@ -860,12 +860,16 @@ function renderExchanges(state) {
 
 function renderZones(state) {
   const { countries } = state.data;
-  const { electricityMixMode } = state.application;
+  const { currentYear, carbonIntensityDomain, electricityMixMode } = state.application;
   if (typeof zoneMap !== 'undefined') {
-    zoneMap.setData(electricityMixMode === 'consumption'
-      ? Object.values(countries)
-      : Object.values(countries)
-        .map(d => Object.assign({}, d, { co2intensity: d.co2intensityProduction })));
+    zoneMap.setData(Object.values(countries)
+      .map(d => Object.assign({}, d, {
+        co2intensity: getCarbonIntensity(
+          carbonIntensityDomain,
+          electricityMixMode,
+          d.series && d.series[currentYear]
+        )
+      })));
   }
 }
 
@@ -879,6 +883,8 @@ observe(state => state.application.electricityMixMode, (electricityMixMode, stat
   renderZones(state);
   renderMap(state);
 });
+
+observe(state => state.application.currentYear, (_, state) => renderZones(state));
 
 // Observe for page change
 observe(state => state.application.showPageState, (showPageState, state) => {

@@ -3,6 +3,7 @@
 
 var d3 = require('d3-format');
 var translation = require('./translation');
+const { CARBON_INTENSITY_DOMAIN } = require('../helpers/constants');
 
 var co2Sub = module.exports.co2Sub = function (str) {
   return str.replace(/CO2/gi, 'CO<span class="sub">2</span>');
@@ -41,4 +42,24 @@ module.exports.scalePower = function (maxPower) {
       formattingFactor: 1e3
     }
 };
+
+module.exports.formatCarbonIntensityUnit = (carbonIntensityDomain) => {
+  if (carbonIntensityDomain === CARBON_INTENSITY_DOMAIN.ENERGY) {
+    
+  }
+  if (carbonIntensityDomain === CARBON_INTENSITY_DOMAIN.POPULATION) {
+    return 'tCO2eq/capita';
+  }
+  throw new Error('Not implemented yet');
+}
+
+module.exports.formatCarbonIntensityShortUnit = (carbonIntensityDomain) => {
+  if (carbonIntensityDomain === CARBON_INTENSITY_DOMAIN.ENERGY) {
+
+  }
+  if (carbonIntensityDomain === CARBON_INTENSITY_DOMAIN.POPULATION) {
+    return 't';
+  }
+  throw new Error('Not implemented yet');
+}
 

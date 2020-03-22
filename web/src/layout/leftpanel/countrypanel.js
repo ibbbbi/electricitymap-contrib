@@ -22,11 +22,11 @@ import { dispatch } from '../../store';
 
 // Modules
 import { updateApplication } from '../../actioncreators';
-import { getCurrentZoneData } from '../../selectors';
+import { getCurrentZoneData, getCarbonIntensity } from '../../selectors';
 import { getCo2Scale } from '../../helpers/scales';
 import { flagUri } from '../../helpers/flags';
 import { getFullZoneName, __ } from '../../helpers/translation';
-import { co2Sub } from '../../helpers/formatting';
+import { co2Sub, formatCarbonIntensityUnit, formatCarbonIntensityShortUnit } from '../../helpers/formatting';
 import { LOW_CARBON_INFO_TOOLTIP_KEY } from '../../helpers/constants';
 
 // TODO: Move all styles from styles.css to here
@@ -97,6 +97,7 @@ const mapStateToProps = state => ({
   data: getCurrentZoneData(state) || {},
   electricityMixMode: state.application.electricityMixMode,
   tableDisplayEmissions: state.application.tableDisplayEmissions,
+  carbonIntensityDomain: state.application.carbonIntensityDomain,
 });
 const mapDispatchToProps = disp => ({
   dispatchApplication: (k, v) => disp(updateApplication(k, v)),
@@ -114,13 +115,16 @@ class Component extends React.PureComponent {
       data,
       electricityMixMode,
       tableDisplayEmissions,
+      carbonIntensityDomain,
     } = this.props;
 
     const datetime = data.stateDatetime || data.datetime;
     const co2ColorScale = getCo2Scale(colorBlindModeEnabled);
-    const co2Intensity = electricityMixMode === 'consumption'
-      ? data.co2intensity
-      : data.co2intensityProduction;
+    const co2Intensity = getCarbonIntensity(
+      carbonIntensityDomain,
+      electricityMixMode,
+      data
+    );
 
     return (
       <div className="country-panel">
@@ -160,14 +164,18 @@ class Component extends React.PureComponent {
                       <span className="country-emission-intensity">
                         {Math.round(co2Intensity) || '?'}
                       </span>
-                      g
+                      {formatCarbonIntensityShortUnit(carbonIntensityDomain)}
                     </div>
                   </div>
                   <div
                     className="country-col-headline"
                     dangerouslySetInnerHTML={{ __html: co2Sub(__('country-panel.carbonintensity')) }}
                   />
-                  <div className="country-col-subtext">(gCO<span className="sub">2</span>eq/kWh)</div>
+                  <div className="country-col-subtext">
+                    (
+                    <span dangerouslySetInnerHTML={{ __html: co2Sub(formatCarbonIntensityUnit(carbonIntensityDomain)) }} />    
+                    )
+                  </div>
                 </div>
                 <div className="country-col country-lowcarbon-wrap">
                   <div id="country-lowcarbon-gauge" className="country-gauge-wrap">

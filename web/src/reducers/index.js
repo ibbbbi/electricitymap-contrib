@@ -1,5 +1,6 @@
 import { combineReducers } from 'redux';
 
+import { CARBON_INTENSITY_DOMAIN } from '../helpers/constants';
 import { getKey } from '../helpers/storage';
 
 import dataReducer from './dataReducer';
@@ -47,6 +48,9 @@ const initialApplicationState = {
   solarEnabled: cookieGetBool('solarEnabled', false),
   useRemoteEndpoint: document.domain === '' || isLocalhost,
   windEnabled: cookieGetBool('windEnabled', false),
+
+  carbonIntensityDomain: CARBON_INTENSITY_DOMAIN.POPULATION,
+  currentYear: '2017',
 
   // TODO(olc): refactor this state
   showPageState: 'map',

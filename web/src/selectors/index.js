@@ -1,3 +1,4 @@
+/* eslint-disable no-else-return */
 import moment from 'moment';
 import {
   flatMap,
@@ -6,6 +7,8 @@ import {
   sortBy,
   uniq,
 } from 'lodash';
+
+import { CARBON_INTENSITY_DOMAIN } from '../helpers/constants';
 
 export function getSelectedZoneHistory(state) {
   const { selectedZoneName } = state.application;
@@ -48,7 +51,27 @@ export function getCurrentZoneData(state) {
   if (zoneTimeIndex === null) {
     const { series } = state.data.countries[zoneName];
     if (!series) { return null; }
-    return series["2018"];
+    return series[state.application.currentYear];
   }
-  return getSelectedZoneHistory(state)[zoneTimeIndex];
+  console.warn('timeIndex is not a good selector. Use year instead');
+  return getSelectedZoneHistory(state)[zoneTimeIndex][1];
+}
+
+export function getCarbonIntensity(carbonIntensityDomain, electricityMixMode, data) {
+  if (!data) { return null; }
+  if (carbonIntensityDomain === CARBON_INTENSITY_DOMAIN.ENERGY) {
+    if (electricityMixMode === 'consumption') {
+      return data['totalFootprintMegatonsCO2'] / data['totalPrimaryEnergyConsumptionTWh'];
+    } else {
+      return data['totalEmissionsMegatonsCO2'] / data['totalPrimaryEnergyProductionTWh'];
+    }
+  }
+  if (carbonIntensityDomain === CARBON_INTENSITY_DOMAIN.POPULATION) {
+    if (electricityMixMode === 'consumption') {
+      return data['totalFootprintTonsCO2PerCapita'];
+    } else {
+      return data['totalFootprintTonsCO2PerCapita'];
+    }
+  }
+  throw new Error('Not implemented yet');
 }

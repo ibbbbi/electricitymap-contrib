@@ -6,6 +6,7 @@ import { connect } from 'react-redux';
 // Modules
 import { updateApplication } from '../actioncreators';
 import { __ } from '../helpers/translation';
+import { formatCarbonIntensityUnit } from '../helpers/formatting';
 
 const { co2Sub } = require('../helpers/formatting');
 
@@ -14,6 +15,7 @@ const { co2Sub } = require('../helpers/formatting');
 
 const mapStateToProps = state => ({
   legendVisible: state.application.legendVisible,
+  carbonIntensityDomain: state.application.carbonIntensityDomain,
 });
 const mapDispatchToProps = dispatch => ({
   dispatchApplication: (k, v) => dispatch(updateApplication(k, v)),
@@ -25,7 +27,7 @@ class Component extends React.PureComponent {
   }
 
   render() {
-    const { legendVisible } = this.props;
+    const { legendVisible, carbonIntensityDomain } = this.props;
     const mobileCollapsedClass = !legendVisible ? 'mobile-collapsed' : '';
 
     return (
@@ -60,9 +62,9 @@ class Component extends React.PureComponent {
             <span dangerouslySetInnerHTML={{ __html: co2Sub(__('legends.carbonintensity')) }} />
             {' '}
             <small>
-              (gCO
-              <span className="sub">2</span>
-              eq/kWh)
+              (
+              <span dangerouslySetInnerHTML={{ __html: co2Sub(formatCarbonIntensityUnit(carbonIntensityDomain)) }} />
+              )
             </small>
           </div>
           <svg className="co2-colorbar colorbar potential-bar" />

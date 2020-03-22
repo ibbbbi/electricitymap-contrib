@@ -356,9 +356,7 @@ const CountryElectricityProductionTable = React.memo(({
         data.maxStorageCapacity || 0,
         data.maxImport || 0,
         data.maxImportCapacity || 0,
-        electricityMixMode === 'consumption'
-          ? data.totalPrimaryEnergyConsumptionTWh
-          : data.totalPrimaryEnergyProductionTWh,
+        d3Max(productionData, d => d.production),
       ),
     ])
     .range([0, width - LABEL_MAX_WIDTH - PADDING_X]);
