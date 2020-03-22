@@ -2,12 +2,15 @@ import moment from 'moment';
 import {
   flatMap,
   keys,
+  last,
   sortBy,
   uniq,
 } from 'lodash';
 
 export function getSelectedZoneHistory(state) {
-  return state.data.histories[state.application.selectedZoneName] || [];
+  const { selectedZoneName } = state.application;
+  if (!selectedZoneName) { return []; }
+  return Object.entries(state.data.countries[selectedZoneName].series || {});
 }
 
 export function getSelectedZoneExchangeKeys(state) {
@@ -17,14 +20,14 @@ export function getSelectedZoneExchangeKeys(state) {
 }
 
 export function getSelectedZoneHistoryDatetimes(state) {
-  return getSelectedZoneHistory(state).map(d => moment(d.stateDatetime).toDate());
+  return getSelectedZoneHistory(state).map(([t, _]) => moment(t).toDate());
 }
 
 // Use current time as the end time of the graph time scale explicitly
 // as we want to make sure we account for the missing data at the end of
 // the graph (when not inferable from historyData timestamps).
 export function getZoneHistoryEndTime(state) {
-  return moment(state.application.customDate || (state.data.grid || {}).datetime).format();
+  return null;
 }
 
 // TODO: Likewise, we should be passing an explicit startTime set to 24h
@@ -39,11 +42,13 @@ export function getZoneHistoryStartTime(state) {
 export function getCurrentZoneData(state) {
   const zoneName = state.application.selectedZoneName;
   const zoneTimeIndex = state.application.selectedZoneTimeIndex;
-  if (!state.data.grid || !zoneName) {
+  if (!zoneName) {
     return null;
   }
   if (zoneTimeIndex === null) {
-    return state.data.grid.zones[zoneName];
+    const { series } = state.data.countries[zoneName];
+    if (!series) { return null; }
+    return series["2018"];
   }
   return getSelectedZoneHistory(state)[zoneTimeIndex];
 }

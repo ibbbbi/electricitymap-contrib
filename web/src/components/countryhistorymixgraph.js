@@ -23,7 +23,7 @@ import {
 import AreaGraph from './graph/areagraph';
 
 const getValuesInfo = (historyData, displayByEmissions) => {
-  const maxTotalValue = d3Max(historyData, d => (
+  const maxTotalValue = d3Max(historyData, ([t, d]) => (
     displayByEmissions
       ? (d.totalCo2Production + d.totalCo2Import + d.totalCo2Discharge) / 1e6 / 60.0 // in tCO2eq/min
       : (d.totalProduction + d.totalImport + d.totalDischarge) // in MW
@@ -41,18 +41,23 @@ const prepareGraphData = (historyData, colorBlindModeEnabled, displayByEmissions
   const { valueAxisLabel, valueFactor } = getValuesInfo(historyData, displayByEmissions);
   const co2ColorScale = getCo2Scale(colorBlindModeEnabled);
 
+  const key = electricityMixMode === 'consumption'
+    ? 'primaryEnergyConsumptionTWh'
+    : 'primaryEnergyProductionTWh';
+
   // Format history data received by the API
   // TODO: Simplify this function and make it more readable
-  const data = historyData.map((d) => {
+  const data = historyData.map((entry) => {
+    const [t, d] = entry;
     const obj = {
-      datetime: moment(d.stateDatetime).toDate(),
+      datetime: moment(t).toDate(),
     };
     // Add production
     modeOrder.forEach((k) => {
       const isStorage = k.indexOf('storage') !== -1;
       const value = isStorage
         ? -1 * Math.min(0, (d.storage || {})[k.replace(' storage', '')])
-        : (d.production || {})[k];
+        : (d[key] || {})[k];
       // in GW or MW
       obj[k] = value / valueFactor;
       if (Number.isFinite(value) && displayByEmissions && obj[k] != null) {
@@ -65,18 +70,18 @@ const prepareGraphData = (historyData, colorBlindModeEnabled, displayByEmissions
       }
     });
     if (electricityMixMode === 'consumption') {
-      // Add exchange
-      forEach(d.exchange, (value, key) => {
-        // in GW or MW
-        obj[key] = Math.max(0, value / valueFactor);
-        if (Number.isFinite(value) && displayByEmissions && obj[key] != null) {
-          // in tCO2eq/min
-          obj[key] *= d.exchangeCo2Intensities[key] / 1e3 / 60.0;
-        }
-      });
+      // // Add exchange
+      // forEach(d.exchange, (value, key) => {
+      //   // in GW or MW
+      //   obj[key] = Math.max(0, value / valueFactor);
+      //   if (Number.isFinite(value) && displayByEmissions && obj[key] != null) {
+      //     // in tCO2eq/min
+      //     obj[key] *= d.exchangeCo2Intensities[key] / 1e3 / 60.0;
+      //   }
+      // });
     }
     // Keep a pointer to original data
-    obj._countryData = d;
+    obj._countryData = entry;
     return obj;
   });
 

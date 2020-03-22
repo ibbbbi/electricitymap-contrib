@@ -33,8 +33,8 @@ const prepareGraphData = (historyData, colorBlindModeEnabled, electricityMixMode
     .range(['yellow', 'red']);
 
   const data = historyData.map(d => ({
-    [PRICES_GRAPH_LAYER_KEY]: d.price && d.price.value,
-    datetime: moment(d.stateDatetime).toDate(),
+    [PRICES_GRAPH_LAYER_KEY]: d[1].gdpMillionsCurrentUSD,
+    datetime: moment(d[0]).toDate(),
     // Keep a pointer to original data
     _countryData: d,
   }));

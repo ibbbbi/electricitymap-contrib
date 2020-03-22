@@ -44,8 +44,6 @@ export default connect(mapStateToProps)(props => (
         <LeftPanel />
         <div id="map-container">
           <div id="zones" className="map-layer" />
-          <canvas id="wind" className="map-layer" />
-          <canvas id="solar" className="map-layer" />
           <div id="watermark" className={`watermark small-screen-hidden ${props.brightModeEnabled ? 'brightmode' : ''}`}>
             <a href="http://www.tmrow.com/mission?utm_source=electricitymap.org&utm_medium=referral&utm_campaign=watermark" target="_blank">
               <div id="built-by-tomorrow" />

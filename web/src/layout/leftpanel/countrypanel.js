@@ -32,31 +32,46 @@ import { LOW_CARBON_INFO_TOOLTIP_KEY } from '../../helpers/constants';
 // TODO: Move all styles from styles.css to here
 // TODO: Remove all unecessary id and class tags
 
+const FOSSIL_FUEL_KEYS = [
+  'oil',
+  'gas',
+  'coal',
+];
+
 const CountryLowCarbonGauge = connect((state) => {
   const d = getCurrentZoneData(state);
-  if (!d) {
+  const key = state.application.electricityMixMode === 'consumption'
+    ? 'primaryEnergyConsumptionTWh'
+    : 'primaryEnergyProductionTWh';
+  const keyTotal = state.application.electricityMixMode === 'consumption'
+    ? 'totalPrimaryEnergyConsumptionTWh'
+    : 'totalPrimaryEnergyProductionTWh';
+  if (!d || !d[key]) {
     return { percentage: null };
   }
-  const fossilFuelRatio = state.application.electricityMixMode === 'consumption'
-    ? d.fossilFuelRatio
-    : d.fossilFuelRatioProduction;
-  const countryLowCarbonPercentage = fossilFuelRatio != null
-    ? 100 - (fossilFuelRatio * 100)
-    : null;
+  const countryLowCarbonPercentage = Object.keys(d[key])
+    .filter(k => !FOSSIL_FUEL_KEYS.includes(k))
+    .map(k => d[key][k])
+    .reduce((a, b) => a + b, 0) / d[keyTotal] * 100;
   return {
     percentage: countryLowCarbonPercentage,
   };
 })(CircularGauge);
 const CountryRenewableGauge = connect((state) => {
   const d = getCurrentZoneData(state);
-  if (!d) {
+  const key = state.application.electricityMixMode === 'consumption'
+    ? 'primaryEnergyConsumptionTWh'
+    : 'primaryEnergyProductionTWh';
+  const keyTotal = state.application.electricityMixMode === 'consumption'
+    ? 'totalPrimaryEnergyConsumptionTWh'
+    : 'totalPrimaryEnergyProductionTWh';
+  if (!d || !d[key]) {
     return { percentage: null };
   }
-  const renewableRatio = state.application.electricityMixMode === 'consumption'
-    ? d.renewableRatio
-    : d.renewableRatioProduction;
-  const countryRenewablePercentage = renewableRatio != null
-    ? renewableRatio * 100 : null;
+  const countryRenewablePercentage = Object.keys(d[key])
+    .filter(k => !FOSSIL_FUEL_KEYS.includes(k) && k !== 'nuclear')
+    .map(k => d[key][k])
+    .reduce((a, b) => a + b, 0) / d[keyTotal] * 100;
   return {
     percentage: countryRenewablePercentage,
   };
@@ -101,7 +116,6 @@ class Component extends React.PureComponent {
       tableDisplayEmissions,
     } = this.props;
 
-    const { hasParser } = data;
     const datetime = data.stateDatetime || data.datetime;
     const co2ColorScale = getCo2Scale(colorBlindModeEnabled);
     const co2Intensity = electricityMixMode === 'consumption'
@@ -133,7 +147,7 @@ class Component extends React.PureComponent {
             </div>
           </div>
 
-          {hasParser && (
+          {true && (
             <React.Fragment>
               <div className="country-table-header-inner">
                 <div className="country-col country-emission-intensity-wrap">
@@ -200,7 +214,7 @@ class Component extends React.PureComponent {
         </div>
 
         <div className="country-panel-wrap">
-          {hasParser ? (
+          {true ? (
             <React.Fragment>
               <div className="bysource">
                 {__('country-panel.bysource')}
@@ -210,7 +224,7 @@ class Component extends React.PureComponent {
 
               <hr />
               <div className="country-history">
-                <div className="loading overlay" />
+                {null && <div className="loading overlay" />}
                 <span
                   className="country-history-title"
                   dangerouslySetInnerHTML={{ __html: co2Sub(__('country-history.carbonintensity24h')) }}
@@ -223,7 +237,7 @@ class Component extends React.PureComponent {
 
                 <CountryHistoryCarbonGraph />
 
-                <div className="loading overlay" />
+                {null && <div className="loading overlay" />}
                 <span
                   className="country-history-title"
                   id="country-history-electricity-carbonintensity"
@@ -241,7 +255,7 @@ class Component extends React.PureComponent {
 
                 <CountryHistoryMixGraph />
 
-                <div className="loading overlay" />
+                {null && <div className="loading overlay" />}
                 <span className="country-history-title">
                   {__('country-history.electricityprices24h')}
                 </span>

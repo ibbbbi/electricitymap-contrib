@@ -65,7 +65,7 @@ const mapStateToProps = state => ({
   colorBlindModeEnabled: state.application.colorBlindModeEnabled,
   currentPage: state.application.showPageState,
   electricityMixMode: state.application.electricityMixMode,
-  gridZones: state.data.grid.zones,
+  gridZones: state.data.countries,
   searchQuery: state.application.searchQuery,
 });
 

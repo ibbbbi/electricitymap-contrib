@@ -298,7 +298,7 @@ try {
       dispatchApplication('centeredZoneName', null);
       // Somehow there is a drag event sent before the map data is loaded.
       // We want to ignore it.
-      if (!mapDraggedSinceStart && getState().data.grid.datetime) {
+      if (!mapDraggedSinceStart) {
         mapDraggedSinceStart = true;
       }
     })
@@ -309,35 +309,6 @@ try {
       map.map.getCanvas()
         .parentNode
         .appendChild(el);
-
-      // Create exchange layer as a result
-      exchangeLayer = new ExchangeLayer('arrows-layer', zoneMap)
-        .onExchangeMouseMove((zoneData) => {
-          const { co2intensity } = zoneData;
-          if (co2intensity) {
-            dispatch({ type: 'SET_CO2_COLORBAR_MARKER', payload: { marker: co2intensity } });
-          }
-          dispatch({
-            type: 'SHOW_TOOLTIP',
-            payload: {
-              data: zoneData,
-              displayMode: MAP_EXCHANGE_TOOLTIP_KEY,
-              position: { x: currentEvent.clientX, y: currentEvent.clientY },
-            },
-          });
-        })
-        .onExchangeMouseOut((d) => {
-          dispatch({ type: 'UNSET_CO2_COLORBAR_MARKER' });
-          dispatch({ type: 'HIDE_TOOLTIP' });
-        })
-        .onExchangeClick((d) => {
-          console.log(d);
-        })
-        .setData(getState().application.electricityMixMode === 'consumption'
-          ? Object.values(getState().data.grid.exchanges)
-          : [])
-        .setColorblindMode(getState().application.colorBlindModeEnabled)
-        .render();
 
       // map loading is finished, lower the overlay shield
       finishLoading();
@@ -592,46 +563,46 @@ const ignoreError = func =>
   };
 
 function fetch(showLoading, callback) {
-  if (showLoading) LoadingService.startLoading('#loading');
-  LoadingService.startLoading('#small-loading');
-  const Q = d3.queue();
-  // We ignore errors in case this is run from a file:// protocol (e.g. cordova)
-  if (getState().application.clientType === 'web' && !getState().application.isLocalhost) {
-    Q.defer(d3.text, '/clientVersion');
-  } else {
-    Q.defer(DataService.fetchNothing);
-  }
-  Q.defer(DataService.fetchState, ENDPOINT, getState().application.customDate);
+  // if (showLoading) LoadingService.startLoading('#loading');
+  // LoadingService.startLoading('#small-loading');
+  // const Q = d3.queue();
+  // // We ignore errors in case this is run from a file:// protocol (e.g. cordova)
+  // if (getState().application.clientType === 'web' && !getState().application.isLocalhost) {
+  //   Q.defer(d3.text, '/clientVersion');
+  // } else {
+  //   Q.defer(DataService.fetchNothing);
+  // }
+  // Q.defer(DataService.fetchState, ENDPOINT, getState().application.customDate);
 
-  const now = getState().application.customDate || new Date();
+  // const now = getState().application.customDate || new Date();
 
-  if (!getState().application.solarEnabled) {
-    Q.defer(DataService.fetchNothing);
-  } else if (!solar || solarLayer.isExpired(now, solar.forecasts[0], solar.forecasts[1])) {
-    Q.defer(ignoreError(DataService.fetchGfs), ENDPOINT, 'solar', now);
-  } else {
-    Q.defer(cb => cb(null, solar));
-  }
+  // if (!getState().application.solarEnabled) {
+  //   Q.defer(DataService.fetchNothing);
+  // } else if (!solar || solarLayer.isExpired(now, solar.forecasts[0], solar.forecasts[1])) {
+  //   Q.defer(ignoreError(DataService.fetchGfs), ENDPOINT, 'solar', now);
+  // } else {
+  //   Q.defer(cb => cb(null, solar));
+  // }
 
-  if (!getState().application.windEnabled || typeof windLayer === 'undefined') {
-    Q.defer(DataService.fetchNothing);
-  } else if (!wind || windLayer.isExpired(now, wind.forecasts[0], wind.forecasts[1])) {
-    Q.defer(ignoreError(DataService.fetchGfs), ENDPOINT, 'wind', now);
-  } else {
-    Q.defer(cb => cb(null, wind));
-  }
-  // eslint-disable-next-line no-shadow
-  Q.await((err, clientVersion, state, solar, wind) => {
-    handleConnectionReturnCode(err);
-    if (!err) {
-      dataLoaded(err, clientVersion, state.data.callerLocation, state.data.callerZone, state.data, solar, wind);
-    }
-    if (showLoading) {
-      LoadingService.stopLoading('#loading');
-    }
-    LoadingService.stopLoading('#small-loading');
+  // if (!getState().application.windEnabled || typeof windLayer === 'undefined') {
+  //   Q.defer(DataService.fetchNothing);
+  // } else if (!wind || windLayer.isExpired(now, wind.forecasts[0], wind.forecasts[1])) {
+  //   Q.defer(ignoreError(DataService.fetchGfs), ENDPOINT, 'wind', now);
+  // } else {
+  //   Q.defer(cb => cb(null, wind));
+  // }
+  // // eslint-disable-next-line no-shadow
+  // Q.await((err, clientVersion, state, solar, wind) => {
+  //   handleConnectionReturnCode(err);
+  //   if (!err) {
+  //     dataLoaded(err, clientVersion, state.data.callerLocation, state.data.callerZone, state.data, solar, wind);
+  //   }
+  //   if (showLoading) {
+  //     LoadingService.stopLoading('#loading');
+  //   }
+  //   LoadingService.stopLoading('#small-loading');
     if (callback) callback();
-  });
+  // });
 }
 
 window.addEventListener('resize', () => {
@@ -847,7 +818,7 @@ function tryFetchHistory(state) {
 
 function centerOnZoneName(state, zoneName, zoomLevel) {
   if (typeof zoneMap === 'undefined') { return; }
-  const selectedZone = state.data.grid.zones[zoneName];
+  const selectedZone = state.data.countries[zoneName];
   const selectedZoneCoordinates = [];
   selectedZone.geometry.coordinates.forEach((geojson) => {
     // selectedZoneCoordinates.push(geojson[0]);
@@ -875,6 +846,7 @@ function centerOnZoneName(state, zoneName, zoomLevel) {
 }
 
 function renderExchanges(state) {
+  return;
   const { exchanges } = state.data.grid;
   const { electricityMixMode } = state.application;
   if (exchangeLayer) {
@@ -887,12 +859,12 @@ function renderExchanges(state) {
 }
 
 function renderZones(state) {
-  const { zones } = state.data.grid;
+  const { countries } = state.data;
   const { electricityMixMode } = state.application;
   if (typeof zoneMap !== 'undefined') {
     zoneMap.setData(electricityMixMode === 'consumption'
-      ? Object.values(zones)
-      : Object.values(zones)
+      ? Object.values(countries)
+      : Object.values(countries)
         .map(d => Object.assign({}, d, { co2intensity: d.co2intensityProduction })));
   }
 }
@@ -905,21 +877,6 @@ observe(state => state.application.co2ColorbarMarker, (co2ColorbarMarker, state)
 observe(state => state.application.electricityMixMode, (electricityMixMode, state) => {
   renderExchanges(state);
   renderZones(state);
-  renderMap(state);
-});
-
-// Observe for grid zones change
-observe(state => state.data.grid.zones, (zones, state) => {
-  renderZones(state);
-});
-
-// Observe for grid exchanges change
-observe(state => state.data.grid.exchanges, (exchanges, state) => {
-  renderExchanges(state);
-});
-
-// Observe for grid change
-observe(state => state.data.grid, (grid, state) => {
   renderMap(state);
 });
 
@@ -937,7 +894,7 @@ observe(state => state.application.selectedZoneName, (selectedZoneName, state) =
   if (!selectedZoneName) { return; }
 
   // Fetch history if needed
-  tryFetchHistory(state);
+  // tryFetchHistory(state);
 });
 
 // Observe for history change
@@ -1040,13 +997,6 @@ observe(state => state.application.showPageState, (_, state) => { delayedUpdateU
 observe(state => state.application.solarEnabled, (_, state) => { delayedUpdateURLFromState(state); });
 observe(state => state.application.useRemoteEndpoint, (_, state) => { delayedUpdateURLFromState(state); });
 observe(state => state.application.windEnabled, (_, state) => { delayedUpdateURLFromState(state); });
-
-// Observe for datetime chanes
-observe(state => state.data.grid, (grid) => {
-  if (grid && grid.datetime) {
-    setLastUpdated();
-  }
-});
 
 // Observe for left panel collapse
 observe(state => state.application.isLeftPanelCollapsed, (_, state) => {

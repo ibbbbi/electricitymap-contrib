@@ -58,13 +58,17 @@ function handleRowMouseOut() {
   dispatch({ type: 'HIDE_TOOLTIP' });
 }
 
-const getProductionData = data => modeOrder.map((mode) => {
+const getProductionData = (data, electricityMixMode) => modeOrder.map((mode) => {
   const isStorage = mode.indexOf('storage') !== -1;
   const resource = mode.replace(' storage', '');
 
+  const key = electricityMixMode === 'consumption'
+    ? 'primaryEnergyConsumptionTWh'
+    : 'primaryEnergyProductionTWh';
+
   // Power in MW
   const capacity = (data.capacity || {})[mode];
-  const production = (data.production || {})[resource];
+  const production = (data[key] || {})[resource]; // TODO: rename `production`
   const storage = (data.storage || {})[resource];
 
   // Production CO2 intensity
@@ -351,16 +355,20 @@ const CountryElectricityProductionTable = React.memo(({
         data.maxDischarge || 0,
         data.maxStorageCapacity || 0,
         data.maxImport || 0,
-        data.maxImportCapacity || 0
+        data.maxImportCapacity || 0,
+        electricityMixMode === 'consumption'
+          ? data.totalPrimaryEnergyConsumptionTWh
+          : data.totalPrimaryEnergyProductionTWh,
       ),
     ])
     .range([0, width - LABEL_MAX_WIDTH - PADDING_X]);
 
   const formatTick = (t) => {
     const [x1, x2] = powerScale.domain();
-    if (x2 - x1 <= 1) return `${t * 1e3} kW`;
-    if (x2 - x1 <= 1e3) return `${t} MW`;
-    return `${t * 1e-3} GW`;
+    // Assumes TWh as entry
+    if (x2 - x1 <= 1) return `${t * 1e3} GWh`;
+    if (x2 - x1 <= 1e3) return `${t} TWh`;
+    return `${t * 1e-3} PWh`;
   };
 
   return (
@@ -458,8 +466,8 @@ const CountryTable = ({
   const width = useWidthObserver(ref);
 
   const productionData = useMemo(
-    () => getProductionData(data),
-    [data]
+    () => getProductionData(data, electricityMixMode),
+    [data, electricityMixMode]
   );
   const exchangeData = useMemo(
     () => getExchangeData(data, exchangeKeys, electricityMixMode),

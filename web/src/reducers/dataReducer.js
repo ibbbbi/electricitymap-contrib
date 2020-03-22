@@ -4,42 +4,39 @@ const { modeOrder } = require('../helpers/constants');
 const constructTopos = require('../helpers/topos');
 const translation = require('../helpers/translation');
 
-const exchangesConfig = require('../../../config/exchanges.json');
 const zonesConfig = require('../../../config/zones.json');
+
+const globalcarbon = require('../globalcarbon.json');
 
 // ** Prepare initial zone data
 const zones = constructTopos();
-Object.entries(zonesConfig).forEach((d) => {
-  const [key, zoneConfig] = d;
-  const zone = zones[key];
-  if (!zone) {
-    console.warn(`Zone ${key} from configuration is not found. Ignoring..`);
-    return;
-  }
-  // copy attributes ("capacity", "contributors"...)
-  zone.capacity = zoneConfig.capacity;
-  zone.contributors = zoneConfig.contributors;
-  zone.timezone = zoneConfig.timezone;
-  zone.shortname = translation.getFullZoneName(key);
-  zone.hasParser = (zoneConfig.parsers || {}).production !== undefined;
-});
+// Object.entries(zonesConfig).forEach((d) => {
+//   const [key, zoneConfig] = d;
+//   const zone = zones[key];
+//   if (!zone) {
+//     console.warn(`Zone ${key} from configuration is not found. Ignoring..`);
+//     return;
+//   }
+//   // copy attributes ("capacity", "contributors"...)
+//   zone.capacity = zoneConfig.capacity;
+//   zone.contributors = zoneConfig.contributors;
+//   zone.timezone = zoneConfig.timezone;
+//   zone.shortname = translation.getFullZoneName(key);
+//   zone.hasParser = (zoneConfig.parsers || {}).production !== undefined;
+// });
 // Add id to each zone
 Object.keys(zones).forEach((k) => { zones[k].countryCode = k; });
-
-// ** Prepare initial exchange data
-const exchanges = Object.assign({}, exchangesConfig);
-Object.entries(exchanges).forEach((entry) => {
-  const [key, value] = entry;
-  value.countryCodes = key.split('->').sort();
-  if (key.split('->')[0] !== value.countryCodes[0]) {
-    console.warn(`Exchange sorted key pair ${key} is not sorted alphabetically`);
+Object.entries(globalcarbon.countries).forEach(([k, v]) => {
+  if (!zones[k]) {
+    console.error(`Couldn't copy global carbon data ${k} to zones. Is a geometry missing?`);
+  } else {
+    zones[k].series = v;
   }
 });
 
 const initialDataState = {
   // Here we will store data items
-  grid: { zones, exchanges },
-  histories: {},
+  countries: zones,
   solar: null, // TODO(olc)
   wind: null, // TODO(olc)
 };
