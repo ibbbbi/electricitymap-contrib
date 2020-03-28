@@ -5,8 +5,8 @@ import { getKey } from '../helpers/storage';
 
 import dataReducer from './dataReducer';
 
-const isLocalhost = window.location.href.indexOf('electricitymap') !== -1
-  || window.location.href.indexOf('192.') !== -1;
+const isProduction = () => window.location.href.includes('electricitymap');
+const isLocalhost = () => !isProduction() && !window.location.href.includes('192.');
 
 const cookieGetBool = (key, defaultValue) => {
   const val = getKey(key);
@@ -24,7 +24,7 @@ const initialApplicationState = {
   callerZone: null,
   centeredZoneName: null,
   clientType: window.isCordova ? 'mobileapp' : 'web',
-  co2ColorbarMarker: undefined,
+  co2ColorbarValue: null,
   colorBlindModeEnabled: cookieGetBool('colorBlindModeEnabled', false),
   brightModeEnabled: cookieGetBool('brightModeEnabled', true),
   customDate: null,
@@ -34,8 +34,8 @@ const initialApplicationState = {
   isLeftPanelCollapsed: false,
   isMobile:
   (/android|blackberry|iemobile|ipad|iphone|ipod|opera mini|webos/i).test(navigator.userAgent),
-  isProduction: window.location.href.indexOf('electricitymap') !== -1,
-  isLocalhost,
+  isProduction: isProduction(),
+  isLocalhost: isLocalhost(),
   legendVisible: true,
   locale: window.locale,
   onboardingSeen: cookieGetBool('onboardingSeen', false),
@@ -45,8 +45,10 @@ const initialApplicationState = {
   searchQuery: null,
   selectedZoneName: null,
   selectedZoneTimeIndex: null,
+  solarColorbarValue: null,
   solarEnabled: cookieGetBool('solarEnabled', false),
-  useRemoteEndpoint: document.domain === '' || isLocalhost,
+  useRemoteEndpoint: false,
+  windColorbarMarker: null,
   windEnabled: cookieGetBool('windEnabled', false),
 
   carbonIntensityDomain: CARBON_INTENSITY_DOMAIN.POPULATION,
@@ -107,20 +109,6 @@ const applicationReducer = (state = initialApplicationState, action) => {
     case 'HIDE_TOOLTIP': {
       return Object.assign({}, state, {
         tooltipDisplayMode: null,
-      });
-    }
-
-    case 'SET_CO2_COLORBAR_MARKER': {
-      const co2ColorbarMarker = action.payload.marker;
-      if (co2ColorbarMarker !== state.co2ColorbarMarker) {
-        return Object.assign({}, state, { co2ColorbarMarker });
-      }
-      return state;
-    }
-
-    case 'UNSET_CO2_COLORBAR_MARKER': {
-      return Object.assign({}, state, {
-        co2ColorbarMarker: undefined,
       });
     }
 
