@@ -281,6 +281,10 @@ for sheet_name in bp_sheet_mapping.keys():
 # ** Postprocess
 for country_iso2, _ in obj.items():
     for (year, v) in obj[country_iso2].items():
+        # Compute totals if not already present
+        if 'totalPrimaryEnergyProductionTWh' not in v and 'primaryEnergyProductionTWh' in v:
+            v['totalPrimaryEnergyProductionTWh'] = sum([d for d in v['primaryEnergyProductionTWh'].values()])
+
         if 'totalFootprintMegatonsCO2' in v and 'populationMillions' in v:
             v['totalFootprintTonsCO2PerCapita'] = v['totalFootprintMegatonsCO2'] / v['populationMillions']
         if 'totalEmissionsMegatonsCO2' in v and 'populationMillions' in v:

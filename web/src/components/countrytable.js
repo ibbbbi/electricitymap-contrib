@@ -215,7 +215,7 @@ const QuestionMarkIfNoData = ({ datapoint, scale }) => {
 
   // If both the value and capacity fills are there, don't show the question mark 
   const value = datapoint.isStorage ? datapoint.storage : datapoint.production;
-  if (datapoint.capacity !== undefined && value !== undefined) return null;
+  if (value !== undefined) return null;
 
   return (
     <text

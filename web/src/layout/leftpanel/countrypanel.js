@@ -238,8 +238,8 @@ class Component extends React.PureComponent {
                 {null && <div className="loading overlay" />}
                 <span className="country-history-title">
                   {!tableDisplayEmissions
-                    ? `Carbon intensity (${electricityMixMode === 'consumption' ? 'territorial' : 'consumed'})`
-                    : `Emissions (${electricityMixMode === 'consumption' ? 'territorial' : 'consumed'})`
+                    ? `Carbon intensity (${electricityMixMode === 'consumption' ? 'territorial' : 'incl. imported'})`
+                    : `Emissions (${electricityMixMode === 'consumption' ? 'territorial' : 'incl. imported'})`
                   }
                 </span>
                 <br />
@@ -256,20 +256,22 @@ class Component extends React.PureComponent {
                 <span className="country-history-title">
                   {tableDisplayEmissions
                     ? __(`country-history.emissions${electricityMixMode === 'consumption' ? 'origin' : 'production'}24h`)
-                    : `Energy mix (${electricityMixMode === 'consumption' ? 'territorial' : 'consumed'})`
+                    : `Energy mix (${electricityMixMode === 'consumption' ? 'territorial' : 'incl. imported'})`
                   }
                 </span>
                 <br />
-                <small className="small-screen-hidden">
-                  <i className="material-icons" aria-hidden="true">file_download</i> <a href="https://data.electricitymap.org/?utm_source=electricitymap.org&utm_medium=referral&utm_campaign=country_panel" target="_blank">{__('country-history.Getdata')}</a>
-                  <span className="pro"><i className="material-icons" aria-hidden="true">lock</i> pro</span>
-                </small>
+                {null && (
+                  <small className="small-screen-hidden">
+                    <i className="material-icons" aria-hidden="true">file_download</i> <a href="https://data.electricitymap.org/?utm_source=electricitymap.org&utm_medium=referral&utm_campaign=country_panel" target="_blank">{__('country-history.Getdata')}</a>
+                    <span className="pro"><i className="material-icons" aria-hidden="true">lock</i> pro</span>
+                  </small>
+                )}
 
                 <CountryHistoryMixGraph />
 
                 {null && <div className="loading overlay" />}
                 <span className="country-history-title">
-                  {__('country-history.electricityprices24h')}
+                  Gross domestic product
                 </span>
 
                 <CountryHistoryPricesGraph />

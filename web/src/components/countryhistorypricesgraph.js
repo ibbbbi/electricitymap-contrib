@@ -24,8 +24,8 @@ import AreaGraph from './graph/areagraph';
 const prepareGraphData = (historyData, colorBlindModeEnabled, electricityMixMode) => {
   if (!historyData || !historyData[0]) return {};
 
-  const currencySymbol = getSymbolFromCurrency(((first(historyData) || {}).price || {}).currency);
-  const valueAxisLabel = `${currencySymbol || '?'} / MWh`;
+  // const currencySymbol = getSymbolFromCurrency(((first(historyData) || {}).price || {}).currency);
+  const valueAxisLabel = 'billion USD (current)';
 
   const priceMaxValue = d3Max(historyData.map(d => (d.price || {}).value));
   const priceColorScale = scaleLinear()
@@ -33,7 +33,7 @@ const prepareGraphData = (historyData, colorBlindModeEnabled, electricityMixMode
     .range(['yellow', 'red']);
 
   const data = historyData.map(d => ({
-    [PRICES_GRAPH_LAYER_KEY]: d[1].gdpMillionsCurrentUSD,
+    [PRICES_GRAPH_LAYER_KEY]: d[1].gdpMillionsCurrentUSD / 1000,
     datetime: moment(d[0]).toDate(),
     // Keep a pointer to original data
     _countryData: d,
