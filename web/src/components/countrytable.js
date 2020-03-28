@@ -109,7 +109,7 @@ const getDataBlockPositions = (productionData, exchangeData) => {
 
   const exchangeFlagX = LABEL_MAX_WIDTH - 4.0 * PADDING_X - DEFAULT_FLAG_SIZE - d3Max(exchangeData, d => d.mode.length) * 8;
   const exchangeHeight = exchangeData.length * (ROW_HEIGHT + PADDING_Y);
-  const exchangeY = productionY + productionHeight + ROW_HEIGHT + PADDING_Y;
+  const exchangeY = productionY + productionHeight;// + ROW_HEIGHT + PADDING_Y;
 
   return {
     productionHeight,

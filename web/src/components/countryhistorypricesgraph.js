@@ -18,6 +18,7 @@ import {
   createGraphLayerMouseMoveHandler,
   createGraphLayerMouseOutHandler,
 } from '../helpers/history';
+import formatting from '../helpers/formatting';
 
 import AreaGraph from './graph/areagraph';
 
@@ -25,15 +26,19 @@ const prepareGraphData = (historyData, colorBlindModeEnabled, electricityMixMode
   if (!historyData || !historyData[0]) return {};
 
   // const currencySymbol = getSymbolFromCurrency(((first(historyData) || {}).price || {}).currency);
-  const valueAxisLabel = 'billion USD (current)';
 
-  const priceMaxValue = d3Max(historyData.map(d => (d.price || {}).value));
+  const priceMaxValue = d3Max(historyData.map(d => d[1].gdpMillionsCurrentUSD));
   const priceColorScale = scaleLinear()
     .domain([0, priceMaxValue])
     .range(['yellow', 'red']);
 
+
+  const format = formatting.scaleGdp(priceMaxValue);
+  const valueAxisLabel = `${format.unit} (current)`;
+  const valueFactor = format.formattingFactor;
+
   const data = historyData.map(d => ({
-    [PRICES_GRAPH_LAYER_KEY]: d[1].gdpMillionsCurrentUSD / 1000,
+    [PRICES_GRAPH_LAYER_KEY]: d[1].gdpMillionsCurrentUSD / valueFactor,
     datetime: moment(d[0]).toDate(),
     // Keep a pointer to original data
     _countryData: d,

@@ -28,7 +28,7 @@ const getValuesInfo = (historyData, displayByEmissions) => {
       ? (d.totalCo2Production + d.totalCo2Import + d.totalCo2Discharge) / 1e6 / 60.0 // in tCO2eq/min
       : (d.totalProduction + d.totalImport + d.totalDischarge) // in MW
   ));
-  const format = formatting.scalePower(maxTotalValue);
+  const format = formatting.scaleEnergy(maxTotalValue);
 
   const valueAxisLabel = displayByEmissions ? 'tCO2eq / min' : format.unit;
   const valueFactor = format.formattingFactor;

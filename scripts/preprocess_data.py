@@ -221,10 +221,10 @@ bp_sheet_mapping = {
     'Oil Consumption - Mtoe': {'key': 'primaryEnergyConsumptionTWh.oil', 'convert': convert_mtoe_to_twh},
     'Gas Consumption - Mtoe': {'key': 'primaryEnergyConsumptionTWh.gas', 'convert': convert_mtoe_to_twh},
     'Coal Consumption - Mtoe': {'key': 'primaryEnergyConsumptionTWh.coal', 'convert': convert_mtoe_to_twh},
-    'Nuclear Consumption - Mtoe': {'key': 'primaryEnergyProductionTWh.nuclear', 'convert': convert_mtoe_to_twh},
-    'Hydro Consumption - Mtoe': {'key': 'primaryEnergyProductionTWh.hydro', 'convert': convert_mtoe_to_twh},
-    'Solar Consumption - Mtoe': {'key': 'primaryEnergyProductionTWh.solar', 'convert': convert_mtoe_to_twh},
-    'Wind Consumption - Mtoe': {'key': 'primaryEnergyProductionTWh.wind', 'convert': convert_mtoe_to_twh},
+    'Nuclear Consumption - Mtoe': {'key': 'primaryEnergyConsumptionTWh.nuclear', 'convert': convert_mtoe_to_twh},
+    'Hydro Consumption - Mtoe': {'key': 'primaryEnergyConsumptionTWh.hydro', 'convert': convert_mtoe_to_twh},
+    'Solar Consumption - Mtoe': {'key': 'primaryEnergyConsumptionTWh.solar', 'convert': convert_mtoe_to_twh},
+    'Wind Consumption - Mtoe': {'key': 'primaryEnergyConsumptionTWh.wind', 'convert': convert_mtoe_to_twh},
 
     # TODO: Add oil prod
     'Gas Production - Mtoe': {'key': 'primaryEnergyProductionTWh.gas', 'convert': convert_mtoe_to_twh},

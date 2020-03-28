@@ -25,22 +25,39 @@ module.exports.formatCo2 = function (d, numDigits) {
   else
     return d3.format('.' + numDigits + 's')(d * 1e6) + 'g ' + co2Sub(translation.translate('ofCO2eqPerMinute'));
 };
-module.exports.scalePower = function (maxPower) {
-  // Assume MW input
-  if (maxPower < 1) 
+module.exports.scaleEnergy = function (maxEnergy) {
+  // Assume TWh input
+  if (maxEnergy < 1) 
     return {
-      unit: "kW",
+      unit: "GWh",
       formattingFactor: 1e-3
     }
-  if (maxPower < 1e3) 
+  if (maxEnergy < 1e3) 
     return {
-      unit: "MW",
+      unit: "TWh",
       formattingFactor: 1
     }
   else return {
-      unit: "GW",
+      unit: "PWh",
       formattingFactor: 1e3
     }
+};
+module.exports.scaleGdp = function (maxGdp) {
+  // Assume million USD input
+  if (maxGdp < 1)
+    return {
+      unit: "k$ USD",
+      formattingFactor: 1e-3
+    }
+  if (maxGdp < 1e3)
+    return {
+      unit: "M$ USD",
+      formattingFactor: 1
+    }
+  else return {
+    unit: "B$ USD",
+    formattingFactor: 1e3
+  }
 };
 
 module.exports.formatCarbonIntensityUnit = (carbonIntensityDomain) => {
@@ -48,7 +65,7 @@ module.exports.formatCarbonIntensityUnit = (carbonIntensityDomain) => {
     
   }
   if (carbonIntensityDomain === CARBON_INTENSITY_DOMAIN.POPULATION) {
-    return 'tCO2eq/capita';
+    return 'tCO2/capita';
   }
   throw new Error('Not implemented yet');
 }
