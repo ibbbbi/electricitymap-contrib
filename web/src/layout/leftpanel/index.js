@@ -18,7 +18,7 @@ import ZoneList from '../../components/zonelist';
 
 // Modules
 import { __ } from '../../helpers/translation';
-import { co2Sub } from '../../helpers/formatting';
+import { co2Sub, formatCarbonIntensityUnit } from '../../helpers/formatting';
 import {
   getSelectedZoneHistoryDatetimes,
   getZoneHistoryStartTime,
@@ -58,6 +58,7 @@ const mapStateToProps = state => ({
   zoneHistoryDatetimes: getSelectedZoneHistoryDatetimes(state),
   zoneHistoryStartTime: getZoneHistoryStartTime(state),
   zoneHistoryEndTime: getZoneHistoryEndTime(state),
+  carbonIntensityDomain: state.application.carbonIntensityDomain,
 });
 
 export default connect(mapStateToProps)(props => (
@@ -84,10 +85,9 @@ export default connect(mapStateToProps)(props => (
         </div>
         <div
           className="subtitle"
-          dangerouslySetInnerHTML={{
-            __html: co2Sub(__('left-panel.zone-list-header-subtitle')),
-          }}
-        />
+        >
+          {`Ranked by carbon intensity of ... (${formatCarbonIntensityUnit(props.carbonIntensityDomain)})`}
+        </div>
       </div>
 
       <SearchBar
