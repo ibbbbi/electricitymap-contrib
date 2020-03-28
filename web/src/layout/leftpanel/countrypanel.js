@@ -238,8 +238,8 @@ class Component extends React.PureComponent {
                 {null && <div className="loading overlay" />}
                 <span className="country-history-title">
                   {!tableDisplayEmissions
-                    ? `Carbon intensity (${electricityMixMode === 'consumption' ? 'territorial' : 'incl. imported'})`
-                    : `Emissions (${electricityMixMode === 'consumption' ? 'territorial' : 'incl. imported'})`
+                    ? `Carbon intensity (${electricityMixMode !== 'consumption' ? 'territorial' : 'incl. imported'})`
+                    : `Emissions (${electricityMixMode !== 'consumption' ? 'territorial' : 'incl. imported'})`
                   }
                 </span>
                 <br />
@@ -256,7 +256,7 @@ class Component extends React.PureComponent {
                 <span className="country-history-title">
                   {tableDisplayEmissions
                     ? __(`country-history.emissions${electricityMixMode === 'consumption' ? 'origin' : 'production'}24h`)
-                    : `Energy mix (${electricityMixMode === 'consumption' ? 'territorial' : 'incl. imported'})`
+                    : `Energy mix (${electricityMixMode !== 'consumption' ? 'territorial' : 'incl. imported'})`
                   }
                 </span>
                 <br />
