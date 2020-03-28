@@ -506,17 +506,21 @@ function dataLoaded(err, clientVersion, callerLocation, callerZone, state, argSo
       .onMouseMove((lonlat) => {
         mapMouseOver(lonlat);
       })
-      .onZoneMouseMove((zoneData, i, clientX, clientY) => {
+      .onZoneMouseMove((countryData, i, clientX, clientY) => {
+        const { currentYear, carbonIntensityDomain, electricityMixMode } = getState().application;
+        const data = countryData.series[currentYear];
+        const co2intensity = getCarbonIntensity(carbonIntensityDomain, electricityMixMode, data);
         dispatchApplication(
           'co2ColorbarValue',
-          getState().application.electricityMixMode === 'consumption'
-            ? zoneData.co2intensity
-            : zoneData.co2intensityProduction
+          co2intensity,
         );
         dispatch({
           type: 'SHOW_TOOLTIP',
           payload: {
-            data: zoneData,
+            data: {
+              data,
+              countryCode: countryData.countryCode,
+            },
             displayMode: MAP_COUNTRY_TOOLTIP_KEY,
             position: {
               x: node.getBoundingClientRect().left + clientX,
@@ -539,10 +543,10 @@ function dataLoaded(err, clientVersion, callerLocation, callerZone, state, argSo
 
   dispatchApplication('callerLocation', callerLocation);
   dispatchApplication('callerZone', callerZone);
-  dispatch({
-    payload: state,
-    type: 'GRID_DATA',
-  });
+  // dispatch({
+  //   payload: state,
+  //   type: 'GRID_DATA',
+  // });
 }
 
 // Periodically load data
@@ -615,6 +619,7 @@ function fetch(showLoading, callback) {
   //   if (!err) {
   //     dataLoaded(err, clientVersion, state.data.callerLocation, state.data.callerZone, state.data, solar, wind);
   //   }
+  dataLoaded();
   //   if (showLoading) {
   //     LoadingService.stopLoading('#loading');
   //   }

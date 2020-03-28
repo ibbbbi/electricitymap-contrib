@@ -8,7 +8,7 @@ import {
   uniq,
 } from 'lodash';
 
-import { CARBON_INTENSITY_DOMAIN } from '../helpers/constants';
+import { CARBON_INTENSITY_DOMAIN, FOSSIL_FUEL_KEYS } from '../helpers/constants';
 
 export function getSelectedZoneHistory(state) {
   const { selectedZoneName } = state.application;
@@ -74,4 +74,27 @@ export function getCarbonIntensity(carbonIntensityDomain, electricityMixMode, da
     }
   }
   throw new Error('Not implemented yet');
+}
+
+function getEnergyRatio(electricityMixMode, data, filter) {
+  const key = electricityMixMode === 'consumption'
+    ? 'primaryEnergyConsumptionTWh'
+    : 'primaryEnergyProductionTWh';
+  const keyTotal = electricityMixMode === 'consumption'
+    ? 'totalPrimaryEnergyConsumptionTWh'
+    : 'totalPrimaryEnergyProductionTWh';
+  if (!data || !data[key]) {
+    return { percentage: null };
+  }
+  return Object.keys(data[key])
+    .filter(filter)
+    .map(k => data[key][k])
+    .reduce((a, b) => a + b, 0) / data[keyTotal];
+}
+
+export function getRenewableRatio(electricityMixMode, data) {
+  return getEnergyRatio(electricityMixMode, data, k => !FOSSIL_FUEL_KEYS.includes(k) && k !== 'nuclear');
+}
+export function getLowcarbonRatio(electricityMixMode, data) {
+  return getEnergyRatio(electricityMixMode, data, k => !FOSSIL_FUEL_KEYS.includes(k));
 }

@@ -32,8 +32,10 @@ export function getExchangeCo2Intensity(mode, zoneData, electricityMixMode) {
     );
 }
 
-export function getTotalElectricity(zoneData, displayByEmissions) {
-  return displayByEmissions
-    ? (zoneData.totalCo2Production + zoneData.totalCo2Discharge + zoneData.totalCo2Import) // gCO2eq/h
-    : (zoneData.totalProduction + zoneData.totalDischarge + zoneData.totalImport);
+export function getTotalElectricity(data, displayByEmissions, electricityMixMode) {
+  if (electricityMixMode === 'consumption') {
+    return displayByEmissions ? data['totalFootprintMegatonsCO2'] : data['totalPrimaryEnergyConsumptionTWh'];
+  } else {
+    return displayByEmissions ? data['totalEmissionsMegatonsCO2'] : data['totalPrimaryEnergyProductionTWh'];
+  }
 }

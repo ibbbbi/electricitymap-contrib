@@ -6,7 +6,7 @@ import { scaleLinear } from 'd3-scale';
 import { connect } from 'react-redux';
 import { first } from 'lodash';
 
-import { PRICES_GRAPH_LAYER_KEY } from '../helpers/constants';
+import { GDP_GRAPH_LAYER_KEY } from '../helpers/constants';
 import {
   getSelectedZoneHistory,
   getZoneHistoryStartTime,
@@ -21,6 +21,19 @@ import {
 import formatting from '../helpers/formatting';
 
 import AreaGraph from './graph/areagraph';
+import Tooltip from './tooltip';
+
+const GdpTooltip = connect((state) => {
+  const { tooltipData, tooltipDisplayMode } = state.application;
+  const visible = tooltipDisplayMode === GDP_GRAPH_LAYER_KEY;
+  if (!visible) return { visible };
+  const { data, year } = tooltipData;
+  const value = data.gdpMillionsCurrentUSD;
+  const format = formatting.scaleGdp(value);
+  const valueAxisLabel = `${format.unit} (current)`;
+  const valueFactor = format.formattingFactor;
+  return { visible, value: `${year}: ${Math.round(value / valueFactor)} ${valueAxisLabel}` };
+})(({ visible, value }) => (visible ? <Tooltip>{value}</Tooltip> : null));
 
 const prepareGraphData = (historyData, colorBlindModeEnabled, electricityMixMode) => {
   if (!historyData || !historyData[0]) return {};
@@ -38,13 +51,13 @@ const prepareGraphData = (historyData, colorBlindModeEnabled, electricityMixMode
   const valueFactor = format.formattingFactor;
 
   const data = historyData.map(d => ({
-    [PRICES_GRAPH_LAYER_KEY]: d[1].gdpMillionsCurrentUSD / valueFactor,
+    [GDP_GRAPH_LAYER_KEY]: d[1].gdpMillionsCurrentUSD / valueFactor,
     datetime: moment(d[0]).toDate(),
     // Keep a pointer to original data
     _countryData: d,
   }));
 
-  const layerKeys = [PRICES_GRAPH_LAYER_KEY];
+  const layerKeys = [GDP_GRAPH_LAYER_KEY];
   const layerStroke = () => 'darkgray';
   const layerFill = () => '#616161';
   const markerFill = key => d => priceColorScale(d.data[key]);
@@ -112,24 +125,27 @@ const CountryHistoryPricesGraph = ({
   );
 
   return (
-    <AreaGraph
-      data={data}
-      layerKeys={layerKeys}
-      layerStroke={layerStroke}
-      layerFill={layerFill}
-      markerFill={markerFill}
-      startTime={startTime}
-      endTime={endTime}
-      valueAxisLabel={valueAxisLabel}
-      backgroundMouseMoveHandler={backgroundMouseMoveHandler}
-      backgroundMouseOutHandler={backgroundMouseOutHandler}
-      layerMouseMoveHandler={layerMouseMoveHandler}
-      layerMouseOutHandler={layerMouseOutHandler}
-      selectedTimeIndex={selectedTimeIndex}
-      selectedLayerIndex={selectedLayerIndex}
-      isMobile={isMobile}
-      height="6em"
-    />
+    <React.Fragment>
+      <AreaGraph
+        data={data}
+        layerKeys={layerKeys}
+        layerStroke={layerStroke}
+        layerFill={layerFill}
+        markerFill={markerFill}
+        startTime={startTime}
+        endTime={endTime}
+        valueAxisLabel={valueAxisLabel}
+        backgroundMouseMoveHandler={backgroundMouseMoveHandler}
+        backgroundMouseOutHandler={backgroundMouseOutHandler}
+        layerMouseMoveHandler={layerMouseMoveHandler}
+        layerMouseOutHandler={layerMouseOutHandler}
+        selectedTimeIndex={selectedTimeIndex}
+        selectedLayerIndex={selectedLayerIndex}
+        isMobile={isMobile}
+        height="6em"
+      />
+      <GdpTooltip />
+    </React.Fragment>
   );
 };
 

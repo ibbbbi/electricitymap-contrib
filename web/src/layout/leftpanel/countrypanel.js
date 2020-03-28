@@ -24,7 +24,7 @@ import { dispatch } from '../../store';
 
 // Modules
 import { updateApplication } from '../../actioncreators';
-import { getCurrentZoneData, getCarbonIntensity } from '../../selectors';
+import { getCurrentZoneData, getCarbonIntensity, getRenewableRatio, getLowcarbonRatio } from '../../selectors';
 import { getCo2Scale } from '../../helpers/scales';
 import { flagUri } from '../../helpers/flags';
 import { getFullZoneName, __ } from '../../helpers/translation';
@@ -34,48 +34,16 @@ import { LOW_CARBON_INFO_TOOLTIP_KEY } from '../../helpers/constants';
 // TODO: Move all styles from styles.css to here
 // TODO: Remove all unecessary id and class tags
 
-const FOSSIL_FUEL_KEYS = [
-  'oil',
-  'gas',
-  'coal',
-];
-
 const CountryLowCarbonGauge = connect((state) => {
   const d = getCurrentZoneData(state);
-  const key = state.application.electricityMixMode === 'consumption'
-    ? 'primaryEnergyConsumptionTWh'
-    : 'primaryEnergyProductionTWh';
-  const keyTotal = state.application.electricityMixMode === 'consumption'
-    ? 'totalPrimaryEnergyConsumptionTWh'
-    : 'totalPrimaryEnergyProductionTWh';
-  if (!d || !d[key]) {
-    return { percentage: null };
-  }
-  const countryLowCarbonPercentage = Object.keys(d[key])
-    .filter(k => !FOSSIL_FUEL_KEYS.includes(k))
-    .map(k => d[key][k])
-    .reduce((a, b) => a + b, 0) / d[keyTotal] * 100;
   return {
-    percentage: countryLowCarbonPercentage,
+    percentage: getLowcarbonRatio(state.application.electricityMixMode, d) * 100,
   };
 })(CircularGauge);
 const CountryRenewableGauge = connect((state) => {
   const d = getCurrentZoneData(state);
-  const key = state.application.electricityMixMode === 'consumption'
-    ? 'primaryEnergyConsumptionTWh'
-    : 'primaryEnergyProductionTWh';
-  const keyTotal = state.application.electricityMixMode === 'consumption'
-    ? 'totalPrimaryEnergyConsumptionTWh'
-    : 'totalPrimaryEnergyProductionTWh';
-  if (!d || !d[key]) {
-    return { percentage: null };
-  }
-  const countryRenewablePercentage = Object.keys(d[key])
-    .filter(k => !FOSSIL_FUEL_KEYS.includes(k) && k !== 'nuclear')
-    .map(k => d[key][k])
-    .reduce((a, b) => a + b, 0) / d[keyTotal] * 100;
   return {
-    percentage: countryRenewablePercentage,
+    percentage: getRenewableRatio(state.application.electricityMixMode, d) * 100,
   };
 })(CircularGauge);
 

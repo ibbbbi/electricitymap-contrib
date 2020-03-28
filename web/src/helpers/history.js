@@ -1,6 +1,6 @@
 import moment from 'moment';
 
-import { dispatch, dispatchApplication } from '../store';
+import { dispatch, dispatchApplication, getState } from '../store';
 
 
 export function createGraphBackgroundMouseMoveHandler() {
@@ -20,7 +20,11 @@ function setLayerTooltip(isMobile, timeIndex, layer, ev, svgRef) {
     dispatch({
       type: 'SHOW_TOOLTIP',
       payload: {
-        data: layer.datapoints[timeIndex].data._countryData,
+        data: {
+          data: layer.datapoints[timeIndex].data._countryData[1],
+          year: layer.datapoints[timeIndex].data._countryData[0],
+          countryCode: getState().application.selectedZoneName,
+        },
         displayMode: layer.key,
         // If in mobile mode, put the tooltip to the top of the screen for
         // readability, otherwise float it depending on the cursor position.

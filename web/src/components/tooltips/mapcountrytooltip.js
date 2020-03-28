@@ -6,6 +6,7 @@ import { __, getFullZoneName } from '../../helpers/translation';
 import { getCo2Scale } from '../../helpers/scales';
 import { co2Sub } from '../../helpers/formatting';
 import { flagUri } from '../../helpers/flags';
+import { getCarbonIntensity, getRenewableRatio, getLowcarbonRatio } from '../../selectors';
 
 import CircularGauge from '../circulargauge';
 import Tooltip from '../tooltip';
@@ -13,7 +14,7 @@ import { ZoneName } from './common';
 
 const mapStateToProps = state => ({
   colorBlindModeEnabled: state.application.colorBlindModeEnabled,
-  countryData: state.application.tooltipData,
+  tooltipData: state.application.tooltipData,
   electricityMixMode: state.application.electricityMixMode,
   visible: state.application.tooltipDisplayMode === MAP_COUNTRY_TOOLTIP_KEY,
   carbonIntensityDomain: state.application.carbonIntensityDomain,
@@ -21,30 +22,26 @@ const mapStateToProps = state => ({
 
 const MapCountryTooltip = ({
   colorBlindModeEnabled,
-  countryData,
+  tooltipData,
   electricityMixMode,
   visible,
 
   carbonIntensityDomain,
 }) => {
-  if (!visible || !countryData) return null;
+  if (!visible || !tooltipData) return null;
+
+  const countryData = tooltipData.data;
+  const { countryCode } = tooltipData;
 
   const co2ColorScale = getCo2Scale(colorBlindModeEnabled, carbonIntensityDomain);
+  const co2intensity = getCarbonIntensity(carbonIntensityDomain, electricityMixMode, countryData);
 
-  const co2intensity = electricityMixMode === 'consumption'
-    ? countryData.co2intensity
-    : countryData.co2intensityProduction;
-
-  const fossilFuelRatio = electricityMixMode === 'consumption'
-    ? countryData.fossilFuelRatio
-    : countryData.fossilFuelRatioProduction;
-  const fossilFuelPercentage = fossilFuelRatio !== null
-    ? Math.round(100 * (1 - fossilFuelRatio))
+  const lowcarbonRatio = getLowcarbonRatio(electricityMixMode, countryData);
+  const lowcarbonPercentage = lowcarbonRatio !== null
+    ? Math.round(100 * lowcarbonRatio)
     : '?';
 
-  const renewableRatio = electricityMixMode === 'consumption'
-    ? countryData.renewableRatio
-    : countryData.renewableRatioProduction;
+  const renewableRatio = getRenewableRatio(electricityMixMode, countryData);
   const renewablePercentage = renewableRatio !== null
     ? Math.round(100 * renewableRatio)
     : '?';
@@ -52,9 +49,9 @@ const MapCountryTooltip = ({
   return (
     <Tooltip id="country-tooltip">
       <div className="zone-name-header">
-        <ZoneName zone={countryData.countryCode} />
+        <ZoneName zone={countryCode} />
       </div>
-      {countryData.hasParser ? (
+      {true ? (
         co2intensity ? (
           <div className="zone-details">
             <div className="country-table-header-inner">
@@ -78,7 +75,7 @@ const MapCountryTooltip = ({
               </div>
               <div className="country-col country-lowcarbon-wrap">
                 <div id="tooltip-country-lowcarbon-gauge" className="country-gauge-wrap">
-                  <CircularGauge percentage={fossilFuelPercentage} />
+                  <CircularGauge percentage={lowcarbonPercentage} />
                 </div>
                 <div
                   className="country-col-headline"

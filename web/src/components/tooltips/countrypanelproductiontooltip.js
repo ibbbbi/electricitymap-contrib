@@ -20,7 +20,7 @@ const mapStateToProps = state => ({
   electricityMixMode: state.application.electricityMixMode,
   mode: state.application.tooltipDisplayMode,
   visible: modeOrder.includes(state.application.tooltipDisplayMode),
-  zoneData: state.application.tooltipData,
+  tooltipData: state.application.tooltipData,
   carbonIntensityDomain: state.application.carbonIntensityDomain,
 });
 
@@ -30,11 +30,15 @@ const CountryPanelProductionTooltip = ({
   exchangeKey,
   mode,
   visible,
-  zoneData,
+  tooltipData,
 
   carbonIntensityDomain,
+  electricityMixMode,
 }) => {
-  if (!visible || !zoneData) return null;
+  if (!visible || !tooltipData) return null;
+
+  const zoneData = tooltipData.data;
+  const { countryCode } = tooltipData;
 
   const co2ColorScale = getCo2Scale(colorBlindModeEnabled, carbonIntensityDomain);
   const co2Intensity = getProductionCo2Intensity(mode, zoneData);
@@ -44,15 +48,19 @@ const CountryPanelProductionTooltip = ({
   const isStorage = mode.indexOf('storage') !== -1;
   const resource = mode.replace(' storage', '');
 
+  const key = electricityMixMode === 'consumption'
+    ? 'primaryEnergyConsumptionTWh'
+    : 'primaryEnergyProductionTWh';
+
   const capacity = (zoneData.capacity || {})[mode];
-  const production = (zoneData.production || {})[resource];
+  const production = (zoneData[key] || {})[resource];
   const storage = (zoneData.storage || {})[resource];
 
   const electricity = isStorage ? -storage : production;
   const isExport = electricity < 0;
 
   const usage = Math.abs(displayByEmissions ? (electricity * co2Intensity * 1000) : electricity);
-  const totalElectricity = getTotalElectricity(zoneData, displayByEmissions);
+  const totalElectricity = getTotalElectricity(zoneData, displayByEmissions, electricityMixMode);
 
   const co2IntensitySource = isStorage
     ? (zoneData.dischargeCo2IntensitySources || {})[resource]
@@ -63,10 +71,10 @@ const CountryPanelProductionTooltip = ({
       ? (displayByEmissions ? 'emissionsStoredUsing' : 'electricityStoredUsing')
       : (displayByEmissions ? 'emissionsComeFrom' : 'electricityComesFrom'),
     getRatioPercent(usage, totalElectricity),
-    getFullZoneName(zoneData.countryCode),
+    getFullZoneName(countryCode),
     __(mode)
   ));
-  headline = headline.replace('id="country-flag"', `class="flag" src="${flagUri(zoneData.countryCode)}"`);
+  headline = headline.replace('id="country-flag"', `class="flag" src="${flagUri(countryCode)}"`);
 
   return (
     <Tooltip id="countrypanel-production-tooltip">
@@ -77,7 +85,7 @@ const CountryPanelProductionTooltip = ({
         total={totalElectricity}
         format={format}
       />
-      {!displayByEmissions && (
+      {null && (
         <React.Fragment>
           <br />
           <br />

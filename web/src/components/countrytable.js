@@ -30,7 +30,7 @@ const RECT_OPACITY = 0.8;
 const X_AXIS_HEIGHT = 15;
 const SCALE_TICKS = 4;
 
-function handleRowMouseMove(isMobile, mode, zoneData, electricityMixMode, ev) {
+function handleRowMouseMove(isMobile, mode, zoneData, electricityMixMode, ev, countryCode) {
   dispatchApplication(
     'co2ColorbarValue',
     modeOrder.includes(mode)
@@ -40,7 +40,10 @@ function handleRowMouseMove(isMobile, mode, zoneData, electricityMixMode, ev) {
   dispatch({
     type: 'SHOW_TOOLTIP',
     payload: {
-      data: zoneData,
+      data: {
+        data: zoneData,
+        countryCode,
+      },
       displayMode: mode,
       // If in mobile mode, put the tooltip to the top of the screen for
       // readability, otherwise float it depending on the cursor position.
@@ -153,6 +156,7 @@ const Row = ({
   label,
   mode,
   width,
+  countryCode,
 }) => (
   <g className="row" transform={`translate(0, ${index * (ROW_HEIGHT + PADDING_Y)})`}>
     {/* Row background */}
@@ -161,9 +165,9 @@ const Row = ({
       fill="transparent"
       width={width}
       height={ROW_HEIGHT + PADDING_Y}
-      onFocus={ev => handleRowMouseMove(isMobile, mode, data, electricityMixMode, ev)}
-      onMouseOver={ev => handleRowMouseMove(isMobile, mode, data, electricityMixMode, ev)}
-      onMouseMove={ev => handleRowMouseMove(isMobile, mode, data, electricityMixMode, ev)}
+      onFocus={ev => handleRowMouseMove(isMobile, mode, data, electricityMixMode, ev, countryCode)}
+      onMouseOver={ev => handleRowMouseMove(isMobile, mode, data, electricityMixMode, ev, countryCode)}
+      onMouseMove={ev => handleRowMouseMove(isMobile, mode, data, electricityMixMode, ev, countryCode)}
       onMouseOut={handleRowMouseOut}
       onBlur={handleRowMouseOut}
     />
@@ -238,6 +242,8 @@ const CountryCarbonEmissionsTable = React.memo(({
   isMobile,
   productionData,
   width,
+  carbonIntensityDomain,
+  countryCode,
 }) => {
   const { productionY, exchangeFlagX, exchangeY } = getDataBlockPositions(productionData, exchangeData);
 
@@ -280,6 +286,7 @@ const CountryCarbonEmissionsTable = React.memo(({
             electricityMixMode={electricityMixMode}
             isMobile={isMobile}
             data={data}
+            countryCode={countryCode}
           >
             <HorizontalBar
               className="production"
@@ -334,6 +341,7 @@ const CountryElectricityProductionTable = React.memo(({
   productionData,
   width,
   carbonIntensityDomain,
+  countryCode,
 }) => {
   const { productionY, exchangeFlagX, exchangeY } = getDataBlockPositions(productionData, exchangeData);
 
@@ -386,6 +394,7 @@ const CountryElectricityProductionTable = React.memo(({
             electricityMixMode={electricityMixMode}
             isMobile={isMobile}
             data={data}
+            countryCode={countryCode}
           >
             <HorizontalBar
               className="capacity"
@@ -417,6 +426,7 @@ const CountryElectricityProductionTable = React.memo(({
             electricityMixMode={electricityMixMode}
             isMobile={isMobile}
             data={data}
+            countryCode={countryCode}
           >
             <image
               style={{ pointerEvents: 'none' }}
@@ -450,6 +460,7 @@ const mapStateToProps = state => ({
   exchangeKeys: getSelectedZoneExchangeKeys(state),
   isMobile: state.application.isMobile,
   carbonIntensityDomain: state.application.carbonIntensityDomain,
+  countryCode: state.application.selectedZoneName,
 });
 
 const CountryTable = ({
@@ -461,6 +472,7 @@ const CountryTable = ({
   isMobile,
   
   carbonIntensityDomain,
+  countryCode,
 }) => {
   const ref = useRef(null);
   const width = useWidthObserver(ref);
@@ -491,6 +503,7 @@ const CountryTable = ({
             height={height}
             isMobile={isMobile}
             carbonIntensityDomain={carbonIntensityDomain}
+            countryCode={countryCode}
           />
         ) : (
           <CountryElectricityProductionTable
@@ -503,6 +516,7 @@ const CountryTable = ({
             height={height}
             isMobile={isMobile}
             carbonIntensityDomain={carbonIntensityDomain}
+            countryCode={countryCode}
           />
         )}
       </svg>

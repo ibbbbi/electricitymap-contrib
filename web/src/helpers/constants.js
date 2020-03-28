@@ -37,9 +37,16 @@ const MAP_COUNTRY_TOOLTIP_KEY = 'map-country';
 
 const CARBON_GRAPH_LAYER_KEY = MAP_COUNTRY_TOOLTIP_KEY;
 const EMISSIONS_GRAPH_LAYER_KEY = 'emissions';
-const PRICES_GRAPH_LAYER_KEY = 'price';
+const GDP_GRAPH_LAYER_KEY = 'gdp';
+const POPULATION_GRAPH_LAYER_KEY = 'population';
 
 const DEFAULT_FLAG_SIZE = 16;
+
+const FOSSIL_FUEL_KEYS = [
+  'oil',
+  'gas',
+  'coal',
+];
 
 module.exports = {
   modeColor,
@@ -48,7 +55,8 @@ module.exports = {
   STORAGE_MODES,
   CARBON_GRAPH_LAYER_KEY,
   EMISSIONS_GRAPH_LAYER_KEY,
-  PRICES_GRAPH_LAYER_KEY,
+  GDP_GRAPH_LAYER_KEY,
+  POPULATION_GRAPH_LAYER_KEY,
   LOW_CARBON_INFO_TOOLTIP_KEY,
   MAP_EXCHANGE_TOOLTIP_KEY,
   MAP_COUNTRY_TOOLTIP_KEY,
@@ -57,5 +65,6 @@ module.exports = {
     ENERGY: 'ENERGY',
     POPULATION: 'POPULATION',
     GDP: 'GDP',
-  }
+  },
+  FOSSIL_FUEL_KEYS,
 };

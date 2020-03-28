@@ -6,7 +6,7 @@ import { scaleLinear } from 'd3-scale';
 import { connect } from 'react-redux';
 import { first } from 'lodash';
 
-import { PRICES_GRAPH_LAYER_KEY } from '../helpers/constants';
+import { POPULATION_GRAPH_LAYER_KEY } from '../helpers/constants';
 import {
   getSelectedZoneHistory,
   getZoneHistoryStartTime,
@@ -38,13 +38,13 @@ const prepareGraphData = (historyData, colorBlindModeEnabled, electricityMixMode
   const valueFactor = format.formattingFactor;
 
   const data = historyData.map(d => ({
-    [PRICES_GRAPH_LAYER_KEY]: d[1].populationMillions / valueFactor,
+    [POPULATION_GRAPH_LAYER_KEY]: d[1].populationMillions / valueFactor,
     datetime: moment(d[0]).toDate(),
     // Keep a pointer to original data
     _countryData: d,
   }));
 
-  const layerKeys = [PRICES_GRAPH_LAYER_KEY];
+  const layerKeys = [POPULATION_GRAPH_LAYER_KEY];
   const layerStroke = () => 'darkgray';
   const layerFill = () => '#616161';
   const markerFill = key => d => colorScale(d.data[key]);
