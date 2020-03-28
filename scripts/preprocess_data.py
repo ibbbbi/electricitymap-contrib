@@ -10,8 +10,9 @@ import numpy as np
 '''
 Create JSON with following structure
 {
-    "DK": {
-        "2017": {
+    "DK": [
+        {
+            year: 2018,
             totalEmissionsMegatonsCO2: ...,
             totalFootprintMegatonsCO2: ...,
             gdpCurrentUSD: ...,
@@ -38,6 +39,7 @@ obj = {}
 country_mapping = {}
 for i, row in pd.read_csv('data/country_mapping.csv')[['Name', 'Code']].iterrows():
     country_mapping[row['Name']] = row['Code']
+country_mapping['Namibia'] = 'NA'
 country_mapping['North Korea'] = 'KP'
 country_mapping['Democratic Republic of the Congo'] = 'CD'
 country_mapping['Faeroe Islands'] = 'FO'
@@ -131,6 +133,10 @@ for (year, country_name), row in df_merged.iterrows():
     if not is_valid_country(country_name):
         continue
     country_iso2 = get_country_iso2(country_name)
+    if int(year) == 1990:
+        if str(country_iso2) == 'nan':
+            print(country_iso2, country_name)
+            raise Exception(f'country_name {country_name} was converted to nan.')
     ensure_year_exists(country_iso2, year)
     country_year = obj[country_iso2][year]
     if not np.isnan(row['territorial_emissions_MtCO2']):
@@ -279,8 +285,9 @@ for sheet_name in bp_sheet_mapping.keys():
 
 
 # ** Postprocess
-for country_iso2, _ in obj.items():
-    for (year, v) in obj[country_iso2].items():
+for country_iso2, country_data in obj.items():
+    for (year, v) in country_data.items():
+
         # Compute totals if not already present
         if 'totalPrimaryEnergyProductionTWh' not in v and 'primaryEnergyProductionTWh' in v:
             v['totalPrimaryEnergyProductionTWh'] = sum([d for d in v['primaryEnergyProductionTWh'].values()])
@@ -298,6 +305,15 @@ for country_iso2, _ in obj.items():
             v['kaya']['energyIntensityWhPerCurrentUSD'] = (v['totalPrimaryEnergyConsumptionTWh'] * 1e12) / (v['gdpMillionsCurrentUSD'] * 1e6)
         if 'totalFootprintMegatonsCO2' in v and 'totalPrimaryEnergyConsumptionTWh' in v:
             v['kaya']['carbonIntensityGramsCO2PerWh'] = (v['totalFootprintMegatonsCO2'] * 1e6 * 1e6) / (v['totalPrimaryEnergyConsumptionTWh'] * 1e12)
+
+        # add metadata
+        v['year'] = year
+        v['countryCode'] = country_iso2
+
+# ** Turn dicts into arrays
+years = sorted(set([int(year) for year, _ in country_data.items() for country_iso2, country_data in obj.items()]))
+for country_iso2, country_data in obj.items():
+    obj[country_iso2] = [country_data.get(year) for year in years]
 
 # ** Add targets
 targets = {

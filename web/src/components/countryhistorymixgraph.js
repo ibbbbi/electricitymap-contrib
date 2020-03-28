@@ -23,7 +23,7 @@ import {
 import AreaGraph from './graph/areagraph';
 
 const getValuesInfo = (historyData, displayByEmissions) => {
-  const maxTotalValue = d3Max(historyData, ([t, d]) => (
+  const maxTotalValue = d3Max(historyData, d => (
     displayByEmissions
       ? (d.totalCo2Production + d.totalCo2Import + d.totalCo2Discharge) / 1e6 / 60.0 // in tCO2eq/min
       : (d.totalProduction + d.totalImport + d.totalDischarge) // in MW
@@ -47,10 +47,9 @@ const prepareGraphData = (historyData, colorBlindModeEnabled, displayByEmissions
 
   // Format history data received by the API
   // TODO: Simplify this function and make it more readable
-  const data = historyData.map((entry) => {
-    const [t, d] = entry;
+  const data = historyData.map((d) => {
     const obj = {
-      datetime: moment(t).toDate(),
+      datetime: moment(d.year.toString()).toDate(),
     };
     // Add production
     modeOrder.forEach((k) => {
@@ -82,7 +81,7 @@ const prepareGraphData = (historyData, colorBlindModeEnabled, displayByEmissions
       // });
     }
     // Keep a pointer to original data
-    obj._countryData = entry;
+    obj._countryData = d;
     return obj;
   });
 

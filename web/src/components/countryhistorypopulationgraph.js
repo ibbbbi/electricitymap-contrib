@@ -27,7 +27,7 @@ const prepareGraphData = (historyData, colorBlindModeEnabled, electricityMixMode
 
   // const currencySymbol = getSymbolFromCurrency(((first(historyData) || {}).price || {}).currency);
 
-  const maxValue = d3Max(historyData.map(d => d[1].populationMillions));
+  const maxValue = d3Max(historyData.map(d => d.populationMillions));
   const colorScale = scaleLinear()
     .domain([0, maxValue])
     .range(['yellow', 'red']);
@@ -38,8 +38,8 @@ const prepareGraphData = (historyData, colorBlindModeEnabled, electricityMixMode
   const valueFactor = format.formattingFactor;
 
   const data = historyData.map(d => ({
-    [POPULATION_GRAPH_LAYER_KEY]: d[1].populationMillions / valueFactor,
-    datetime: moment(d[0]).toDate(),
+    [POPULATION_GRAPH_LAYER_KEY]: d.populationMillions / valueFactor,
+    datetime: moment(d.year.toString()).toDate(),
     // Keep a pointer to original data
     _countryData: d,
   }));

@@ -27,8 +27,8 @@ const GdpTooltip = connect((state) => {
   const { tooltipData, tooltipDisplayMode } = state.application;
   const visible = tooltipDisplayMode === GDP_GRAPH_LAYER_KEY;
   if (!visible) return { visible };
-  const { data, year } = tooltipData;
-  const value = data.gdpMillionsCurrentUSD;
+  const { year } = tooltipData;
+  const value = tooltipData.gdpMillionsCurrentUSD;
   const format = formatting.scaleGdp(value);
   const valueAxisLabel = `${format.unit} (current)`;
   const valueFactor = format.formattingFactor;
@@ -40,7 +40,7 @@ const prepareGraphData = (historyData, colorBlindModeEnabled, electricityMixMode
 
   // const currencySymbol = getSymbolFromCurrency(((first(historyData) || {}).price || {}).currency);
 
-  const priceMaxValue = d3Max(historyData.map(d => d[1].gdpMillionsCurrentUSD));
+  const priceMaxValue = d3Max(historyData.map(d => d.gdpMillionsCurrentUSD));
   const priceColorScale = scaleLinear()
     .domain([0, priceMaxValue])
     .range(['yellow', 'red']);
@@ -51,8 +51,8 @@ const prepareGraphData = (historyData, colorBlindModeEnabled, electricityMixMode
   const valueFactor = format.formattingFactor;
 
   const data = historyData.map(d => ({
-    [GDP_GRAPH_LAYER_KEY]: d[1].gdpMillionsCurrentUSD / valueFactor,
-    datetime: moment(d[0]).toDate(),
+    [GDP_GRAPH_LAYER_KEY]: d.gdpMillionsCurrentUSD / valueFactor,
+    datetime: moment(d.year.toString()).toDate(),
     // Keep a pointer to original data
     _countryData: d,
   }));

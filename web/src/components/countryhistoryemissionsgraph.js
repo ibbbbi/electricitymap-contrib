@@ -25,9 +25,9 @@ const prepareGraphData = (historyData, colorBlindModeEnabled, electricityMixMode
   const co2ColorScale = getCo2Scale(colorBlindModeEnabled, carbonIntensityDomain);
   const data = historyData.map(d => ({
     [EMISSIONS_GRAPH_LAYER_KEY]: electricityMixMode === 'consumption'
-      ? d[1]['totalFootprintMegatonsCO2']
-      : d[1]['totalEmissionsMegatonsCO2'],
-    datetime: moment(d[0]).toDate(),
+      ? d['totalFootprintMegatonsCO2']
+      : d['totalEmissionsMegatonsCO2'],
+    datetime: moment(d.year.toString()).toDate(),
     // Keep a pointer to original data
     _countryData: d,
   }));

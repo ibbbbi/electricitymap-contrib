@@ -52,7 +52,7 @@ const initialApplicationState = {
   windEnabled: cookieGetBool('windEnabled', false),
 
   carbonIntensityDomain: CARBON_INTENSITY_DOMAIN.POPULATION,
-  currentYear: '2017',
+  currentYear: 2017,
 
   // TODO(olc): refactor this state
   showPageState: 'map',

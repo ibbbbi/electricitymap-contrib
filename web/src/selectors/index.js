@@ -13,7 +13,7 @@ import { CARBON_INTENSITY_DOMAIN, FOSSIL_FUEL_KEYS } from '../helpers/constants'
 export function getSelectedZoneHistory(state) {
   const { selectedZoneName } = state.application;
   if (!selectedZoneName) { return []; }
-  return Object.entries(state.data.countries[selectedZoneName].series || {});
+  return state.data.countries[selectedZoneName].series || [];
 }
 
 export function getSelectedZoneExchangeKeys(state) {
@@ -23,14 +23,14 @@ export function getSelectedZoneExchangeKeys(state) {
 }
 
 export function getSelectedZoneHistoryDatetimes(state) {
-  return getSelectedZoneHistory(state).map(([t, _]) => moment(t).toDate());
+  return getSelectedZoneHistory(state).map(d => moment(d.year.toString()).toDate());
 }
 
 // Use current time as the end time of the graph time scale explicitly
 // as we want to make sure we account for the missing data at the end of
 // the graph (when not inferable from historyData timestamps).
 export function getZoneHistoryEndTime(state) {
-  return null;
+  return '2019';
 }
 
 // TODO: Likewise, we should be passing an explicit startTime set to 24h
@@ -45,16 +45,16 @@ export function getZoneHistoryStartTime(state) {
 export function getCurrentZoneData(state) {
   const zoneName = state.application.selectedZoneName;
   const zoneTimeIndex = state.application.selectedZoneTimeIndex;
+  const { currentYear } = state.application;
   if (!zoneName) {
     return null;
   }
   if (zoneTimeIndex === null) {
     const { series } = state.data.countries[zoneName];
     if (!series) { return null; }
-    return series[state.application.currentYear];
+    return series.find(d => d.year === currentYear);
   }
-  console.warn('timeIndex is not a good selector. Use year instead');
-  return getSelectedZoneHistory(state)[zoneTimeIndex][1];
+  return getSelectedZoneHistory(state)[zoneTimeIndex];
 }
 
 export function getCarbonIntensity(carbonIntensityDomain, electricityMixMode, data) {

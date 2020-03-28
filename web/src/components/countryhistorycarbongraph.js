@@ -28,9 +28,9 @@ const prepareGraphData = (historyData, colorBlindModeEnabled, electricityMixMode
     [CARBON_GRAPH_LAYER_KEY]: getCarbonIntensity(
       carbonIntensityDomain,
       electricityMixMode,
-      d[1],
+      d,
     ),
-    datetime: moment(d[0]).toDate(),
+    datetime: moment(d.year.toString()).toDate(),
     // Keep a pointer to original data
     _countryData: d,
   }));

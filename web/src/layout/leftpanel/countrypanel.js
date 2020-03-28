@@ -64,7 +64,7 @@ const hideLowCarbonInfoTooltip = () => {
 const mapStateToProps = state => ({
   colorBlindModeEnabled: state.application.colorBlindModeEnabled,
   countryCode: state.application.selectedZoneName || '',
-  data: getCurrentZoneData(state) || {},
+  data: getCurrentZoneData(state),
   electricityMixMode: state.application.electricityMixMode,
   tableDisplayEmissions: state.application.tableDisplayEmissions,
   carbonIntensityDomain: state.application.carbonIntensityDomain,
@@ -90,7 +90,7 @@ class Component extends React.PureComponent {
       currentYear,
     } = this.props;
 
-    const datetime = currentYear;
+    const datetime = (data ? data.year : currentYear).toString();
     const co2ColorScale = getCo2Scale(colorBlindModeEnabled, carbonIntensityDomain);
     const co2Intensity = getCarbonIntensity(
       carbonIntensityDomain,
@@ -123,7 +123,7 @@ class Component extends React.PureComponent {
             </div>
           </div>
 
-          {data && Object.keys(data).length ? (
+          {data ? (
             <React.Fragment>
               <div className="country-table-header-inner">
                 <div className="country-col country-emission-intensity-wrap">
@@ -196,7 +196,7 @@ class Component extends React.PureComponent {
         </div>
 
         <div className="country-panel-wrap">
-          {data && Object.keys(data).length ? (
+          {data ? (
             <React.Fragment>
               <div className="bysource">
                 {__('country-panel.bysource')}

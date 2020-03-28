@@ -30,8 +30,8 @@ const MapCountryTooltip = ({
 }) => {
   if (!visible || !tooltipData) return null;
 
-  const countryData = tooltipData.data;
-  const { countryCode } = tooltipData;
+  const countryData = tooltipData;
+  const { countryCode, year } = tooltipData;
 
   const co2ColorScale = getCo2Scale(colorBlindModeEnabled, carbonIntensityDomain);
   const co2intensity = getCarbonIntensity(carbonIntensityDomain, electricityMixMode, countryData);

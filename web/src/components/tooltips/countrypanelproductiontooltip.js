@@ -37,8 +37,8 @@ const CountryPanelProductionTooltip = ({
 }) => {
   if (!visible || !tooltipData) return null;
 
-  const zoneData = tooltipData.data;
-  const { countryCode } = tooltipData;
+  const zoneData = tooltipData;
+  const { countryCode } = zoneData;
 
   const co2ColorScale = getCo2Scale(colorBlindModeEnabled, carbonIntensityDomain);
   const co2Intensity = getProductionCo2Intensity(mode, zoneData);

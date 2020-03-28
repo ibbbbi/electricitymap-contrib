@@ -507,8 +507,8 @@ function dataLoaded(err, clientVersion, callerLocation, callerZone, state, argSo
         mapMouseOver(lonlat);
       })
       .onZoneMouseMove((countryData, i, clientX, clientY) => {
-        const { currentYear, carbonIntensityDomain, electricityMixMode } = getState().application;
-        const data = countryData.series[currentYear];
+        const { carbonIntensityDomain, electricityMixMode } = getState().application;
+        const data = getCurrentZoneData(getState());
         const co2intensity = getCarbonIntensity(carbonIntensityDomain, electricityMixMode, data);
         dispatchApplication(
           'co2ColorbarValue',
@@ -517,10 +517,7 @@ function dataLoaded(err, clientVersion, callerLocation, callerZone, state, argSo
         dispatch({
           type: 'SHOW_TOOLTIP',
           payload: {
-            data: {
-              data,
-              countryCode: countryData.countryCode,
-            },
+            data,
             displayMode: MAP_COUNTRY_TOOLTIP_KEY,
             position: {
               x: node.getBoundingClientRect().left + clientX,
@@ -879,8 +876,8 @@ function renderZones(state) {
         co2intensity: getCarbonIntensity(
           carbonIntensityDomain,
           electricityMixMode,
-          d.series && d.series[currentYear]
-        )
+          d.series && d.series.find(d => d.year === currentYear)
+        ),
       })));
   }
 }
