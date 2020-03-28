@@ -66,6 +66,7 @@ const mapStateToProps = state => ({
   electricityMixMode: state.application.electricityMixMode,
   gridZones: state.data.countries,
   searchQuery: state.application.searchQuery,
+  carbonIntensityDomain: state.application.carbonIntensityDomain,
 });
 
 const ZoneList = ({
@@ -74,8 +75,10 @@ const ZoneList = ({
   electricityMixMode,
   gridZones,
   searchQuery,
+
+  carbonIntensityDomain,
 }) => {
-  const co2ColorScale = getCo2Scale(colorBlindModeEnabled);
+  const co2ColorScale = getCo2Scale(colorBlindModeEnabled, carbonIntensityDomain);
   const co2IntensityAccessor = getCo2IntensityAccessor(electricityMixMode);
   const zones = processZones(gridZones, co2IntensityAccessor)
     .filter(z => zoneMatchesQuery(z, searchQuery));

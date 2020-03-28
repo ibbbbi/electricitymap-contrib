@@ -21,6 +21,7 @@ const mapStateToProps = state => ({
   mode: state.application.tooltipDisplayMode,
   visible: modeOrder.includes(state.application.tooltipDisplayMode),
   zoneData: state.application.tooltipData,
+  carbonIntensityDomain: state.application.carbonIntensityDomain,
 });
 
 const CountryPanelProductionTooltip = ({
@@ -30,10 +31,12 @@ const CountryPanelProductionTooltip = ({
   mode,
   visible,
   zoneData,
+
+  carbonIntensityDomain,
 }) => {
   if (!visible || !zoneData) return null;
 
-  const co2ColorScale = getCo2Scale(colorBlindModeEnabled);
+  const co2ColorScale = getCo2Scale(colorBlindModeEnabled, carbonIntensityDomain);
   const co2Intensity = getProductionCo2Intensity(mode, zoneData);
 
   const format = displayByEmissions ? formatCo2 : formatPower;
@@ -92,6 +95,7 @@ const CountryPanelProductionTooltip = ({
           <CarbonIntensity
             colorBlindModeEnabled={colorBlindModeEnabled}
             intensity={co2Intensity}
+            carbonIntensityDomain={carbonIntensityDomain}
           />
           <small> ({__('country-panel.source')}: {co2IntensitySource || '?'})</small>
         </React.Fragment>

@@ -16,6 +16,7 @@ const mapStateToProps = state => ({
   countryData: state.application.tooltipData,
   electricityMixMode: state.application.electricityMixMode,
   visible: state.application.tooltipDisplayMode === MAP_COUNTRY_TOOLTIP_KEY,
+  carbonIntensityDomain: state.application.carbonIntensityDomain,
 });
 
 const MapCountryTooltip = ({
@@ -23,10 +24,12 @@ const MapCountryTooltip = ({
   countryData,
   electricityMixMode,
   visible,
+
+  carbonIntensityDomain,
 }) => {
   if (!visible || !countryData) return null;
 
-  const co2ColorScale = getCo2Scale(colorBlindModeEnabled);
+  const co2ColorScale = getCo2Scale(colorBlindModeEnabled, carbonIntensityDomain);
 
   const co2intensity = electricityMixMode === 'consumption'
     ? countryData.co2intensity

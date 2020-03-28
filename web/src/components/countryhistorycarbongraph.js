@@ -18,10 +18,10 @@ import {
 
 import AreaGraph from './graph/areagraph';
 
-const prepareGraphData = (historyData, colorBlindModeEnabled, electricityMixMode) => {
+const prepareGraphData = (historyData, colorBlindModeEnabled, electricityMixMode, carbonIntensityDomain) => {
   if (!historyData || !historyData[0]) return {};
 
-  const co2ColorScale = getCo2Scale(colorBlindModeEnabled);
+  const co2ColorScale = getCo2Scale(colorBlindModeEnabled, carbonIntensityDomain);
   const data = historyData.map(d => ({
     [CARBON_GRAPH_LAYER_KEY]: electricityMixMode === 'consumption'
       ? d[1]['totalFootprintMegatonsCO2']
@@ -43,6 +43,7 @@ const mapStateToProps = state => ({
   historyData: getSelectedZoneHistory(state),
   isMobile: state.application.isMobile,
   selectedTimeIndex: state.application.selectedZoneTimeIndex,
+  carbonIntensityDomain: state.application.carbonIntensityDomain,
 });
 
 const CountryHistoryCarbonGraph = ({
@@ -53,13 +54,15 @@ const CountryHistoryCarbonGraph = ({
   historyData,
   isMobile,
   selectedTimeIndex,
+
+  carbonIntensityDomain,
 }) => {
   const [selectedLayerIndex, setSelectedLayerIndex] = useState(null);
 
   // Recalculate graph data only when the history data is changed
   const { data, layerKeys, layerFill } = useMemo(
-    () => prepareGraphData(historyData, colorBlindModeEnabled, electricityMixMode),
-    [historyData, colorBlindModeEnabled, electricityMixMode]
+    () => prepareGraphData(historyData, colorBlindModeEnabled, electricityMixMode, carbonIntensityDomain),
+    [historyData, colorBlindModeEnabled, electricityMixMode, carbonIntensityDomain]
   );
 
   // Mouse action handlers

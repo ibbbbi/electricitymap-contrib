@@ -333,10 +333,11 @@ const CountryElectricityProductionTable = React.memo(({
   isMobile,
   productionData,
   width,
+  carbonIntensityDomain,
 }) => {
   const { productionY, exchangeFlagX, exchangeY } = getDataBlockPositions(productionData, exchangeData);
 
-  const co2ColorScale = getCo2Scale(colorBlindModeEnabled);
+  const co2ColorScale = getCo2Scale(colorBlindModeEnabled, carbonIntensityDomain);
 
   // Power in MW
   const powerScale = scaleLinear()
@@ -448,6 +449,7 @@ const mapStateToProps = state => ({
   electricityMixMode: state.application.electricityMixMode,
   exchangeKeys: getSelectedZoneExchangeKeys(state),
   isMobile: state.application.isMobile,
+  carbonIntensityDomain: state.application.carbonIntensityDomain,
 });
 
 const CountryTable = ({
@@ -457,6 +459,8 @@ const CountryTable = ({
   electricityMixMode,
   exchangeKeys,
   isMobile,
+  
+  carbonIntensityDomain,
 }) => {
   const ref = useRef(null);
   const width = useWidthObserver(ref);
@@ -486,6 +490,7 @@ const CountryTable = ({
             width={width}
             height={height}
             isMobile={isMobile}
+            carbonIntensityDomain={carbonIntensityDomain}
           />
         ) : (
           <CountryElectricityProductionTable
@@ -497,6 +502,7 @@ const CountryTable = ({
             width={width}
             height={height}
             isMobile={isMobile}
+            carbonIntensityDomain={carbonIntensityDomain}
           />
         )}
       </svg>

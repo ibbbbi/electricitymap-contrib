@@ -20,6 +20,7 @@ const mapStateToProps = state => ({
   exchangeKey: state.application.tooltipDisplayMode,
   visible: getSelectedZoneExchangeKeys(state).includes(state.application.tooltipDisplayMode),
   zoneData: state.application.tooltipData,
+  carbonIntensityDomain: state.application.carbonIntensityDomain,
 });
 
 const CountryPanelExchangeTooltip = ({
@@ -29,10 +30,12 @@ const CountryPanelExchangeTooltip = ({
   exchangeKey,
   visible,
   zoneData,
+
+  carbonIntensityDomain,
 }) => {
   if (!visible || !zoneData) return null;
 
-  const co2ColorScale = getCo2Scale(colorBlindModeEnabled);
+  const co2ColorScale = getCo2Scale(colorBlindModeEnabled, carbonIntensityDomain);
   const co2Intensity = getExchangeCo2Intensity(exchangeKey, zoneData, electricityMixMode);
 
   const format = displayByEmissions ? formatCo2 : formatPower;
@@ -86,6 +89,7 @@ const CountryPanelExchangeTooltip = ({
           <CarbonIntensity
             colorBlindModeEnabled={colorBlindModeEnabled}
             intensity={co2Intensity}
+            carbonIntensityDomain={carbonIntensityDomain}
           />
         </React.Fragment>
       )}

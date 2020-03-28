@@ -30,13 +30,13 @@ export const solarColor = scaleLinear()
   .clamp(true);
 
 // ** CO2
-export const getCo2Scale = (colorBlindModeEnabled) => {
+export const getCo2Scale = (colorBlindModeEnabled, carbonIntensityDomain) => {
   const theme = colorBlindModeEnabled
     ? themes.colorblindScale
     : themes.co2Scale;
 
   return scaleLinear()
-    .domain(theme.steps)
+    .domain(theme.steps(carbonIntensityDomain))
     .range(theme.colors)
     .unknown('gray')
     .clamp(true);

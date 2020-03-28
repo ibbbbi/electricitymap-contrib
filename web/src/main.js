@@ -254,7 +254,8 @@ d3.select('.database-ad').classed('visible', !randomBoolean);
 // Set up co2 scales
 let co2ColorScale;
 function updateCo2Scale() {
-  co2ColorScale = getCo2Scale(getState().application.colorBlindModeEnabled);
+  const { colorBlindModeEnabled, carbonIntensityDomain } = getState().application;
+  co2ColorScale = getCo2Scale(colorBlindModeEnabled, carbonIntensityDomain);
   if (typeof zoneMap !== 'undefined') zoneMap.setCo2color(co2ColorScale, theme);
 }
 
@@ -927,16 +928,48 @@ observe(state => state.application.colorBlindModeEnabled, (colorBlindModeEnabled
 });
 
 // Observe for bright mode changes
-observe(state => state.application.brightModeEnabled, (brightModeEnabled) => {
+observe(state => state.application.brightModeEnabled, (brightModeEnabled, state) => {
+  const { carbonIntensityDomain } = state.application;
   d3.selectAll('.brightmode-button').classed('active', brightModeEnabled);
   saveKey('brightModeEnabled', brightModeEnabled);
   // update Theme
-  if (getState().application.brightModeEnabled) {
+  if (brightModeEnabled) {
     theme = themes.bright;
   } else {
     theme = themes.dark;
   }
-  if (typeof zoneMap !== 'undefined') zoneMap.setTheme(theme);
+  if (typeof zoneMap !== 'undefined') {
+    zoneMap.setTheme({
+      ...theme,
+      co2Scale: {
+        ...theme.co2Scale,
+        // hack to map the map work (as it only uses `theme.co2Scale.steps`)
+        steps: theme.co2Scale.steps(carbonIntensityDomain),
+      },
+    });
+  }
+});
+// Observe for carbonIntensityDomain changes
+observe(state => state.application.carbonIntensityDomain, (carbonIntensityDomain, state) => {
+  const { brightModeEnabled } = state.application;
+  d3.selectAll('.brightmode-button').classed('active', brightModeEnabled);
+  saveKey('brightModeEnabled', brightModeEnabled);
+  // update Theme
+  if (brightModeEnabled) {
+    theme = themes.bright;
+  } else {
+    theme = themes.dark;
+  }
+  if (typeof zoneMap !== 'undefined') {
+    zoneMap.setTheme({
+      ...theme,
+      co2Scale: {
+        ...theme.co2Scale,
+        // hack to map the map work (as it only uses `theme.co2Scale.steps`)
+        steps: theme.co2Scale.steps(carbonIntensityDomain),
+      },
+    });
+  }
 });
 
 // Observe for solar settings change

@@ -35,11 +35,11 @@ const getValuesInfo = (historyData, displayByEmissions) => {
   return { valueAxisLabel, valueFactor };
 };
 
-const prepareGraphData = (historyData, colorBlindModeEnabled, displayByEmissions, electricityMixMode, exchangeKeys) => {
+const prepareGraphData = (historyData, colorBlindModeEnabled, displayByEmissions, electricityMixMode, exchangeKeys, carbonIntensityDomain) => {
   if (!historyData || !historyData[0]) return {};
 
   const { valueAxisLabel, valueFactor } = getValuesInfo(historyData, displayByEmissions);
-  const co2ColorScale = getCo2Scale(colorBlindModeEnabled);
+  const co2ColorScale = getCo2Scale(colorBlindModeEnabled, carbonIntensityDomain);
 
   const key = electricityMixMode === 'consumption'
     ? 'primaryEnergyConsumptionTWh'
@@ -115,6 +115,7 @@ const mapStateToProps = state => ({
   historyData: getSelectedZoneHistory(state),
   isMobile: state.application.isMobile,
   selectedTimeIndex: state.application.selectedZoneTimeIndex,
+  carbonIntensityDomain: state.application.carbonIntensityDomain,
 });
 
 const CountryHistoryMixGraph = ({
@@ -127,6 +128,8 @@ const CountryHistoryMixGraph = ({
   historyData,
   isMobile,
   selectedTimeIndex,
+
+  carbonIntensityDomain,
 }) => {
   const [selectedLayerIndex, setSelectedLayerIndex] = useState(null);
 
@@ -137,8 +140,8 @@ const CountryHistoryMixGraph = ({
     layerFill,
     valueAxisLabel,
   } = useMemo(
-    () => prepareGraphData(historyData, colorBlindModeEnabled, displayByEmissions, electricityMixMode, exchangeKeys),
-    [historyData, colorBlindModeEnabled, displayByEmissions, electricityMixMode, exchangeKeys]
+    () => prepareGraphData(historyData, colorBlindModeEnabled, displayByEmissions, electricityMixMode, exchangeKeys, carbonIntensityDomain),
+    [historyData, colorBlindModeEnabled, displayByEmissions, electricityMixMode, exchangeKeys, carbonIntensityDomain]
   );
 
   // Mouse action handlers

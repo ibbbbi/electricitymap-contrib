@@ -53,7 +53,7 @@ export default class Map {
         'fill-color': this.theme.clickableFill,
       };
       if (this.co2color) {
-        const co2Range = [0, 200, 400, 600, 800, 1000];
+        const co2Range = this.theme.co2Scale.steps;
         const stops = co2Range.map(d => [d, this.co2color(d)]);
         paint['fill-color'] = {
           stops,

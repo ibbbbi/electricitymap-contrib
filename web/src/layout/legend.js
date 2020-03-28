@@ -94,7 +94,7 @@ const Legend = ({
             </div>
             <HorizontalColorbar
               id="carbon-intensity-bar"
-              colorScale={getCo2Scale(colorBlindModeEnabled)}
+              colorScale={getCo2Scale(colorBlindModeEnabled, carbonIntensityDomain)}
               currentValue={co2ColorbarValue}
               markerColor="white"
               ticksCount={5}

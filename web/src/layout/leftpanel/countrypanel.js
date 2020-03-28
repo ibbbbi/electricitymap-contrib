@@ -120,7 +120,7 @@ class Component extends React.PureComponent {
     } = this.props;
 
     const datetime = data.stateDatetime || data.datetime;
-    const co2ColorScale = getCo2Scale(colorBlindModeEnabled);
+    const co2ColorScale = getCo2Scale(colorBlindModeEnabled, carbonIntensityDomain);
     const co2Intensity = getCarbonIntensity(
       carbonIntensityDomain,
       electricityMixMode,

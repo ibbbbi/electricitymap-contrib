@@ -12,9 +12,15 @@ const mapStateToProps = state => ({
   colorBlindModeEnabled: state.application.colorBlindModeEnabled,
   exchangeData: state.application.tooltipData,
   visible: state.application.tooltipDisplayMode === MAP_EXCHANGE_TOOLTIP_KEY,
+  carbonIntensityDomain: state.application.carbonIntensityDomain,
 });
 
-const MapExchangeTooltip = ({ colorBlindModeEnabled, exchangeData, visible }) => {
+const MapExchangeTooltip = ({
+  colorBlindModeEnabled,
+  exchangeData,
+  visible,
+  carbonIntensityDomain,
+}) => {
   if (!visible) return null;
 
   const isExporting = exchangeData.netFlow > 0;
@@ -34,6 +40,7 @@ const MapExchangeTooltip = ({ colorBlindModeEnabled, exchangeData, visible }) =>
       <CarbonIntensity
         colorBlindModeEnabled={colorBlindModeEnabled}
         intensity={exchangeData.co2intensity}
+        carbonIntensityDomain={carbonIntensityDomain}
       />
     </Tooltip>
   );
