@@ -16,7 +16,8 @@ import ContributorList from '../../components/contributorlist';
 import CountryHistoryCarbonGraph from '../../components/countryhistorycarbongraph';
 import CountryHistoryEmissionsGraph from '../../components/countryhistoryemissionsgraph';
 import CountryHistoryMixGraph from '../../components/countryhistorymixgraph';
-import CountryHistoryPricesGraph from '../../components/countryhistorypricesgraph';
+import CountryHistoryGdpGraph from '../../components/countryhistorygdpgraph';
+import CountryHistoryPopulationGraph from '../../components/countryhistorypopulationgraph';
 import CountryTable from '../../components/countrytable';
 
 import { dispatch } from '../../store';
@@ -276,7 +277,13 @@ class Component extends React.PureComponent {
                   Gross domestic product
                 </span>
 
-                <CountryHistoryPricesGraph />
+                <CountryHistoryGdpGraph />
+
+                <span className="country-history-title">
+                  Population
+                </span>
+
+                <CountryHistoryPopulationGraph />
               </div>
               <hr />
               <div>

@@ -65,6 +65,29 @@ module.exports.scaleGdp = function (maxGdp) {
   }
 };
 
+module.exports.scaleMillions = function (maxGdp) {
+  // Assume million USD input
+  if (maxGdp < 1)
+    return {
+      unit: "Thousand",
+      formattingFactor: 1e-3
+    }
+  if (maxGdp < 1e3)
+    return {
+      unit: "Million",
+      formattingFactor: 1
+    }
+  if (maxGdp < 1e6)
+    return {
+      unit: "Billion",
+      formattingFactor: 1e3
+    }
+  else return {
+    unit: "Trillion",
+    formattingFactor: 1e6
+  }
+};
+
 module.exports.formatCarbonIntensityUnit = (carbonIntensityDomain) => {
   if (carbonIntensityDomain === CARBON_INTENSITY_DOMAIN.ENERGY) {
     
