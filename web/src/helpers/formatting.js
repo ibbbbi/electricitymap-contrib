@@ -54,9 +54,14 @@ module.exports.scaleGdp = function (maxGdp) {
       unit: "M$ USD",
       formattingFactor: 1
     }
+  if (maxGdp < 1e6)
+    return {
+      unit: "B$ USD",
+      formattingFactor: 1e3
+    }
   else return {
-    unit: "B$ USD",
-    formattingFactor: 1e3
+    unit: "T$ USD",
+    formattingFactor: 1e6
   }
 };
 
