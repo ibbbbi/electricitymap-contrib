@@ -62,11 +62,12 @@ const prepareGraphData = (historyData, colorBlindModeEnabled, displayByEmissions
       obj[k] = value / valueFactor;
       if (Number.isFinite(value) && displayByEmissions && obj[k] != null) {
         // in tCO2eq/min
-        if (isStorage && obj[k] >= 0) {
-          obj[k] *= d.dischargeCo2Intensities[k.replace(' storage', '')] / 1e3 / 60.0;
-        } else {
-          obj[k] *= d.productionCo2Intensities[k] / 1e3 / 60.0;
-        }
+        // HACK: do nothing for now
+        // if (isStorage && obj[k] >= 0) {
+        //   obj[k] *= d.dischargeCo2Intensities[k.replace(' storage', '')] / 1e3 / 60.0;
+        // } else {
+        //   obj[k] *= d.productionCo2Intensities[k] / 1e3 / 60.0;
+        // }
       }
     });
     if (electricityMixMode === 'consumption') {

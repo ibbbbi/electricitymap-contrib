@@ -8,6 +8,7 @@ import {
   getSelectedZoneHistory,
   getZoneHistoryStartTime,
   getZoneHistoryEndTime,
+  getCarbonIntensity,
 } from '../selectors';
 import {
   createSingleLayerGraphBackgroundMouseMoveHandler,
@@ -15,6 +16,7 @@ import {
   createGraphLayerMouseMoveHandler,
   createGraphLayerMouseOutHandler,
 } from '../helpers/history';
+import { formatCarbonIntensityUnit } from '../helpers/formatting';
 
 import AreaGraph from './graph/areagraph';
 
@@ -23,9 +25,11 @@ const prepareGraphData = (historyData, colorBlindModeEnabled, electricityMixMode
 
   const co2ColorScale = getCo2Scale(colorBlindModeEnabled, carbonIntensityDomain);
   const data = historyData.map(d => ({
-    [CARBON_GRAPH_LAYER_KEY]: electricityMixMode === 'consumption'
-      ? d[1]['totalFootprintMegatonsCO2']
-      : d[1]['totalEmissionsMegatonsCO2'],
+    [CARBON_GRAPH_LAYER_KEY]: getCarbonIntensity(
+      carbonIntensityDomain,
+      electricityMixMode,
+      d[1],
+    ),
     datetime: moment(d[0]).toDate(),
     // Keep a pointer to original data
     _countryData: d,
@@ -90,7 +94,7 @@ const CountryHistoryCarbonGraph = ({
       layerFill={layerFill}
       startTime={startTime}
       endTime={endTime}
-      valueAxisLabel="g / kWh"
+      valueAxisLabel={formatCarbonIntensityUnit(carbonIntensityDomain)}
       backgroundMouseMoveHandler={backgroundMouseMoveHandler}
       backgroundMouseOutHandler={backgroundMouseOutHandler}
       layerMouseMoveHandler={layerMouseMoveHandler}

@@ -70,7 +70,7 @@ export function getCarbonIntensity(carbonIntensityDomain, electricityMixMode, da
     if (electricityMixMode === 'consumption') {
       return data['totalFootprintTonsCO2PerCapita'];
     } else {
-      return data['totalFootprintTonsCO2PerCapita'];
+      return data['totalEmissionsTonsCO2PerCapita'];
     }
   }
   throw new Error('Not implemented yet');

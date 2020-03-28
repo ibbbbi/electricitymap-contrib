@@ -99,6 +99,7 @@ const mapStateToProps = state => ({
   electricityMixMode: state.application.electricityMixMode,
   tableDisplayEmissions: state.application.tableDisplayEmissions,
   carbonIntensityDomain: state.application.carbonIntensityDomain,
+  currentYear: state.application.currentYear,
 });
 const mapDispatchToProps = disp => ({
   dispatchApplication: (k, v) => disp(updateApplication(k, v)),
@@ -117,9 +118,10 @@ class Component extends React.PureComponent {
       electricityMixMode,
       tableDisplayEmissions,
       carbonIntensityDomain,
+      currentYear,
     } = this.props;
 
-    const datetime = data.stateDatetime || data.datetime;
+    const datetime = currentYear;
     const co2ColorScale = getCo2Scale(colorBlindModeEnabled, carbonIntensityDomain);
     const co2Intensity = getCarbonIntensity(
       carbonIntensityDomain,
@@ -145,7 +147,7 @@ class Component extends React.PureComponent {
                     {getFullZoneName(countryCode)}
                   </div>
                   <div className="country-time">
-                    {datetime ? moment(datetime).format('LL LT') : ''}
+                    {datetime ? moment(datetime).format('YYYY') : ''}
                   </div>
                 </div>
               </div>
@@ -235,17 +237,18 @@ class Component extends React.PureComponent {
               <div className="country-history">
                 {null && <div className="loading overlay" />}
                 <span className="country-history-title">
-                  {co2Sub(__(
-                    tableDisplayEmissions
-                      ? 'country-history.emissions24h'
-                      : 'country-history.carbonintensity24h'
-                  ))}
+                  {!tableDisplayEmissions
+                    ? `Carbon intensity (${electricityMixMode === 'consumption' ? 'territorial' : 'consumed'})`
+                    : `Emissions (${electricityMixMode === 'consumption' ? 'territorial' : 'consumed'})`
+                  }
                 </span>
                 <br />
-                <small className="small-screen-hidden">
-                  <i className="material-icons" aria-hidden="true">file_download</i> <a href="https://data.electricitymap.org/?utm_source=electricitymap.org&utm_medium=referral&utm_campaign=country_panel" target="_blank">{__('country-history.Getdata')}</a>
-                  <span className="pro"><i className="material-icons" aria-hidden="true">lock</i> pro</span>
-                </small>
+                {null && (
+                  <small className="small-screen-hidden">
+                    <i className="material-icons" aria-hidden="true">file_download</i> <a href="https://data.electricitymap.org/?utm_source=electricitymap.org&utm_medium=referral&utm_campaign=country_panel" target="_blank">{__('country-history.Getdata')}</a>
+                    <span className="pro"><i className="material-icons" aria-hidden="true">lock</i> pro</span>
+                  </small>
+                )}
 
                 {tableDisplayEmissions ? <CountryHistoryEmissionsGraph /> : <CountryHistoryCarbonGraph />}
 
@@ -253,7 +256,7 @@ class Component extends React.PureComponent {
                 <span className="country-history-title">
                   {tableDisplayEmissions
                     ? __(`country-history.emissions${electricityMixMode === 'consumption' ? 'origin' : 'production'}24h`)
-                    : __(`country-history.electricity${electricityMixMode === 'consumption' ? 'origin' : 'production'}24h`)
+                    : `Energy mix (${electricityMixMode === 'consumption' ? 'territorial' : 'consumed'})`
                   }
                 </span>
                 <br />

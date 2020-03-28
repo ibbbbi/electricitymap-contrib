@@ -17,53 +17,53 @@ import {
   createGraphLayerMouseMoveHandler,
   createGraphLayerMouseOutHandler,
 } from '../helpers/history';
-import { tonsPerHourToGramsPerMinute } from '../helpers/math';
-import { getTotalElectricity } from '../helpers/zonedata';
 
 import AreaGraph from './graph/areagraph';
 
-const prepareGraphData = (historyData) => {
+const prepareGraphData = (historyData, colorBlindModeEnabled, electricityMixMode, carbonIntensityDomain) => {
   if (!historyData || !historyData[0]) return {};
-
+  const co2ColorScale = getCo2Scale(colorBlindModeEnabled, carbonIntensityDomain);
   const data = historyData.map(d => ({
-    [EMISSIONS_GRAPH_LAYER_KEY]: tonsPerHourToGramsPerMinute(getTotalElectricity(d, true)),
-    datetime: moment(d.stateDatetime).toDate(),
+    [EMISSIONS_GRAPH_LAYER_KEY]: electricityMixMode === 'consumption'
+      ? d[1]['totalFootprintMegatonsCO2']
+      : d[1]['totalEmissionsMegatonsCO2'],
+    datetime: moment(d[0]).toDate(),
     // Keep a pointer to original data
     _countryData: d,
   }));
-
-  const maxEmissions = d3Max(data.map(d => d[EMISSIONS_GRAPH_LAYER_KEY]));
-  const emissionsColorScale = scaleLinear()
-    .domain([0, maxEmissions])
-    .range(['yellow', 'brown']);
-
   const layerKeys = [EMISSIONS_GRAPH_LAYER_KEY];
-  const layerFill = key => d => emissionsColorScale(d.data[key]);
+  const layerFill = key => d => co2ColorScale(d.data[key]);
   return { data, layerKeys, layerFill };
 };
 
 const mapStateToProps = state => ({
+  colorBlindModeEnabled: state.application.colorBlindModeEnabled,
+  electricityMixMode: state.application.electricityMixMode,
   startTime: getZoneHistoryStartTime(state),
   endTime: getZoneHistoryEndTime(state),
   historyData: getSelectedZoneHistory(state),
   isMobile: state.application.isMobile,
   selectedTimeIndex: state.application.selectedZoneTimeIndex,
+  carbonIntensityDomain: state.application.carbonIntensityDomain,
 });
 
 const CountryHistoryEmissionsGraph = ({
-  displayByEmissions,
+  colorBlindModeEnabled,
+  electricityMixMode,
   startTime,
   endTime,
   historyData,
   isMobile,
   selectedTimeIndex,
+
+  carbonIntensityDomain,
 }) => {
   const [selectedLayerIndex, setSelectedLayerIndex] = useState(null);
 
   // Recalculate graph data only when the history data is changed
   const { data, layerKeys, layerFill } = useMemo(
-    () => prepareGraphData(historyData),
-    [historyData]
+    () => prepareGraphData(historyData, colorBlindModeEnabled, electricityMixMode, carbonIntensityDomain),
+    [historyData, colorBlindModeEnabled, electricityMixMode, carbonIntensityDomain]
   );
 
   // Mouse action handlers
@@ -91,7 +91,7 @@ const CountryHistoryEmissionsGraph = ({
       layerFill={layerFill}
       startTime={startTime}
       endTime={endTime}
-      valueAxisLabel="tCO2eq / min"
+      valueAxisLabel="MtCO2eq / year"
       backgroundMouseMoveHandler={backgroundMouseMoveHandler}
       backgroundMouseOutHandler={backgroundMouseOutHandler}
       layerMouseMoveHandler={layerMouseMoveHandler}
