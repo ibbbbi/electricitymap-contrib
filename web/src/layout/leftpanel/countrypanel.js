@@ -152,7 +152,7 @@ class Component extends React.PureComponent {
             </div>
           </div>
 
-          {true && (
+          {data && Object.keys(data).length ? (
             <React.Fragment>
               <div className="country-table-header-inner">
                 <div className="country-col country-emission-intensity-wrap">
@@ -219,11 +219,11 @@ class Component extends React.PureComponent {
                 </div>
               </div>
             </React.Fragment>
-          )}
+          ) : null}
         </div>
 
         <div className="country-panel-wrap">
-          {true ? (
+          {data && Object.keys(data).length ? (
             <React.Fragment>
               <div className="bysource">
                 {__('country-panel.bysource')}
