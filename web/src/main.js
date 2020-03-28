@@ -256,7 +256,17 @@ let co2ColorScale;
 function updateCo2Scale() {
   const { colorBlindModeEnabled, carbonIntensityDomain } = getState().application;
   co2ColorScale = getCo2Scale(colorBlindModeEnabled, carbonIntensityDomain);
-  if (typeof zoneMap !== 'undefined') zoneMap.setCo2color(co2ColorScale, theme);
+  if (typeof zoneMap !== 'undefined') {
+    const newTheme = {
+      ...theme,
+      co2Scale: {
+        ...theme.co2Scale,
+        // hack to map the map work (as it only uses `theme.co2Scale.steps`)
+        steps: theme.co2Scale.steps(carbonIntensityDomain),
+      },
+    };
+    zoneMap.setCo2color(co2ColorScale, newTheme);
+  }
 }
 
 d3.select('#checkbox-colorblind').node().checked = getState().application.colorBlindModeEnabled;
