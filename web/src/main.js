@@ -517,8 +517,8 @@ function dataLoaded(err, clientVersion, callerLocation, callerZone, state, argSo
         mapMouseOver(lonlat);
       })
       .onZoneMouseMove((countryData, i, clientX, clientY) => {
-        const { carbonIntensityDomain, electricityMixMode } = getState().application;
-        const data = getCurrentZoneData(getState());
+        const { carbonIntensityDomain, electricityMixMode, currentYear } = getState().application;
+        const data = countryData.series.find(d => d.year === currentYear);
         const co2intensity = getCarbonIntensity(carbonIntensityDomain, electricityMixMode, data);
         dispatchApplication(
           'co2ColorbarValue',
@@ -701,12 +701,12 @@ if (!getState().application.isMobile) {
 }
 
 // Production/Consumption
-function toggleElectricityMixMode() {
-  dispatchApplication('electricityMixMode', getState().application.electricityMixMode === 'consumption'
-    ? 'production'
-    : 'consumption');
-}
-d3.select('.production-toggle').on('click', toggleElectricityMixMode);
+// function toggleElectricityMixMode() {
+//   dispatchApplication('electricityMixMode', getState().application.electricityMixMode === 'consumption'
+//     ? 'production'
+//     : 'consumption');
+// }
+// d3.select('.production-toggle').on('click', toggleElectricityMixMode);
 
 const prodConsButtonTootltip = d3.select('#production-toggle-tooltip');
 d3.select('.production-toggle-info').on('click', () => {
@@ -886,7 +886,7 @@ function renderZones(state) {
         co2intensity: getCarbonIntensity(
           carbonIntensityDomain,
           electricityMixMode,
-          d.series && d.series.find(d => d.year === currentYear)
+          d.series && d.series.find(serie => serie.year === currentYear)
         ),
       })));
   }
@@ -966,22 +966,8 @@ observe(state => state.application.carbonIntensityDomain, (carbonIntensityDomain
   const { brightModeEnabled } = state.application;
   d3.selectAll('.brightmode-button').classed('active', brightModeEnabled);
   saveKey('brightModeEnabled', brightModeEnabled);
-  // update Theme
-  if (brightModeEnabled) {
-    theme = themes.bright;
-  } else {
-    theme = themes.dark;
-  }
-  if (typeof zoneMap !== 'undefined') {
-    zoneMap.setTheme({
-      ...theme,
-      co2Scale: {
-        ...theme.co2Scale,
-        // hack to map the map work (as it only uses `theme.co2Scale.steps`)
-        steps: theme.co2Scale.steps(carbonIntensityDomain),
-      },
-    });
-  }
+  updateCo2Scale(); // update scale
+  renderZones(state); // update carbon intensity
 });
 
 // Observe for solar settings change

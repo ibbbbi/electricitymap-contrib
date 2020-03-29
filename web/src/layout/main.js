@@ -11,6 +11,7 @@ import LayerButtons from './layerbuttons';
 import LeftPanel from './leftpanel';
 import Legend from './legend';
 import ProdConsToggle from './prodconstoggle';
+import DomainToggle from './domaintoggle';
 import Tabs from './tabs';
 import Tooltips from './tooltips';
 
@@ -53,7 +54,11 @@ export default connect(mapStateToProps)(props => (
             </a>
           </div>
           <Legend />
-          <ProdConsToggle />
+          <div className="controls-container">
+            <ProdConsToggle />
+            <br />
+            <DomainToggle />
+          </div>
           <LayerButtons />
         </div>
 

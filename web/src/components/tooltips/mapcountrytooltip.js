@@ -4,7 +4,7 @@ import { connect } from 'react-redux';
 import { MAP_COUNTRY_TOOLTIP_KEY } from '../../helpers/constants';
 import { __, getFullZoneName } from '../../helpers/translation';
 import { getCo2Scale } from '../../helpers/scales';
-import { co2Sub } from '../../helpers/formatting';
+import { co2Sub, formatCarbonIntensityShortUnit } from '../../helpers/formatting';
 import { flagUri } from '../../helpers/flags';
 import { getCarbonIntensity, getRenewableRatio, getLowcarbonRatio } from '../../selectors';
 
@@ -63,9 +63,9 @@ const MapCountryTooltip = ({
                 >
                   <div>
                     <span className="country-emission-intensity">
-                      {Math.round(co2intensity) || '?'}
+                      {co2intensity != null ? Math.round(co2intensity) : '?'}
                     </span>
-                    g
+                    {formatCarbonIntensityShortUnit(carbonIntensityDomain)}
                   </div>
                 </div>
                 <div

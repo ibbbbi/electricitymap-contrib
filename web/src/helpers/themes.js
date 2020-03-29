@@ -5,7 +5,10 @@ function getMaxCo2(carbonIntensityDomain) {
     return 20;
   }
   if (carbonIntensityDomain === CARBON_INTENSITY_DOMAIN.GDP) {
-    return null;
+    return 2000;
+  }
+  if (carbonIntensityDomain === CARBON_INTENSITY_DOMAIN.ENERGY) {
+    return 400;
   }
   return null;
 }

@@ -90,21 +90,18 @@ module.exports.scaleMillions = function (maxGdp) {
 
 module.exports.formatCarbonIntensityUnit = (carbonIntensityDomain) => {
   if (carbonIntensityDomain === CARBON_INTENSITY_DOMAIN.ENERGY) {
-    
+    return 'tCO2/GWh'; // i.e. ktCO2/TWh
   }
   if (carbonIntensityDomain === CARBON_INTENSITY_DOMAIN.POPULATION) {
     return 'tCO2/capita';
+  }
+  if (carbonIntensityDomain === CARBON_INTENSITY_DOMAIN.GDP) {
+    return 'gCO2/$'; // i.e. tCO2/M$
   }
   throw new Error('Not implemented yet');
 }
 
 module.exports.formatCarbonIntensityShortUnit = (carbonIntensityDomain) => {
-  if (carbonIntensityDomain === CARBON_INTENSITY_DOMAIN.ENERGY) {
-
-  }
-  if (carbonIntensityDomain === CARBON_INTENSITY_DOMAIN.POPULATION) {
-    return 't';
-  }
-  throw new Error('Not implemented yet');
+  return module.exports.formatCarbonIntensityUnit(carbonIntensityDomain)[0];
 }
 

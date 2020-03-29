@@ -61,9 +61,9 @@ export function getCarbonIntensity(carbonIntensityDomain, electricityMixMode, da
   if (!data) { return null; }
   if (carbonIntensityDomain === CARBON_INTENSITY_DOMAIN.ENERGY) {
     if (electricityMixMode === 'consumption') {
-      return data['totalFootprintMegatonsCO2'] / data['totalPrimaryEnergyConsumptionTWh'];
+      return data['totalFootprintMegatonsCO2'] / data['totalPrimaryEnergyConsumptionTWh'] * 1000;
     } else {
-      return data['totalEmissionsMegatonsCO2'] / data['totalPrimaryEnergyProductionTWh'];
+      return data['totalEmissionsMegatonsCO2'] / data['totalPrimaryEnergyProductionTWh'] * 1000;
     }
   }
   if (carbonIntensityDomain === CARBON_INTENSITY_DOMAIN.POPULATION) {
@@ -71,6 +71,13 @@ export function getCarbonIntensity(carbonIntensityDomain, electricityMixMode, da
       return data['totalFootprintTonsCO2PerCapita'];
     } else {
       return data['totalEmissionsTonsCO2PerCapita'];
+    }
+  }
+  if (carbonIntensityDomain === CARBON_INTENSITY_DOMAIN.GDP) {
+    if (electricityMixMode === 'consumption') {
+      return data['totalFootprintMegatonsCO2'] / data['gdpMillionsCurrentUSD'] * 1e6;
+    } else {
+      return data['totalEmissionsMegatonsCO2'] / data['gdpMillionsCurrentUSD'] * 1e6;
     }
   }
   throw new Error('Not implemented yet');

@@ -29,7 +29,7 @@ import { getCo2Scale } from '../../helpers/scales';
 import { flagUri } from '../../helpers/flags';
 import { getFullZoneName, __ } from '../../helpers/translation';
 import { co2Sub, formatCarbonIntensityUnit, formatCarbonIntensityShortUnit } from '../../helpers/formatting';
-import { LOW_CARBON_INFO_TOOLTIP_KEY } from '../../helpers/constants';
+import { LOW_CARBON_INFO_TOOLTIP_KEY, CARBON_INTENSITY_DOMAIN } from '../../helpers/constants';
 
 // TODO: Move all styles from styles.css to here
 // TODO: Remove all unecessary id and class tags
@@ -134,7 +134,7 @@ class Component extends React.PureComponent {
                   >
                     <div>
                       <span className="country-emission-intensity">
-                        {Math.round(co2Intensity) || '?'}
+                        {co2Intensity != null ? Math.round(co2Intensity) : '?'}
                       </span>
                       {formatCarbonIntensityShortUnit(carbonIntensityDomain)}
                     </div>
@@ -179,7 +179,7 @@ class Component extends React.PureComponent {
                     onClick={this.toggleSource}
                     className={!tableDisplayEmissions ? 'selected' : null}
                   >
-                    {`Energy ${electricityMixMode === 'consumption' ? 'consumption' : 'production'}`}
+                    Intensity
                   </a>
                   |
                   <a
@@ -187,7 +187,7 @@ class Component extends React.PureComponent {
                     onClick={this.toggleSource}
                     className={tableDisplayEmissions ? 'selected' : null}
                   >
-                    Carbon emissions
+                    Emissions
                   </a>
                 </div>
               </div>
@@ -198,13 +198,6 @@ class Component extends React.PureComponent {
         <div className="country-panel-wrap">
           {data ? (
             <React.Fragment>
-              <div className="bysource">
-                {__('country-panel.bysource')}
-              </div>
-
-              <CountryTable />
-
-              <hr />
               <div className="country-history">
                 {null && <div className="loading overlay" />}
                 <span className="country-history-title">
@@ -214,44 +207,51 @@ class Component extends React.PureComponent {
                   }
                 </span>
                 <br />
-                {null && (
-                  <small className="small-screen-hidden">
-                    <i className="material-icons" aria-hidden="true">file_download</i> <a href="https://data.electricitymap.org/?utm_source=electricitymap.org&utm_medium=referral&utm_campaign=country_panel" target="_blank">{__('country-history.Getdata')}</a>
-                    <span className="pro"><i className="material-icons" aria-hidden="true">lock</i> pro</span>
-                  </small>
-                )}
 
                 {tableDisplayEmissions ? <CountryHistoryEmissionsGraph /> : <CountryHistoryCarbonGraph />}
 
-                {null && <div className="loading overlay" />}
-                <span className="country-history-title">
-                  {tableDisplayEmissions
-                    ? __(`country-history.emissions${electricityMixMode === 'consumption' ? 'origin' : 'production'}24h`)
-                    : `Energy mix (${electricityMixMode !== 'consumption' ? 'territorial' : 'incl. imported'})`
-                  }
-                </span>
-                <br />
-                {null && (
-                  <small className="small-screen-hidden">
-                    <i className="material-icons" aria-hidden="true">file_download</i> <a href="https://data.electricitymap.org/?utm_source=electricitymap.org&utm_medium=referral&utm_campaign=country_panel" target="_blank">{__('country-history.Getdata')}</a>
-                    <span className="pro"><i className="material-icons" aria-hidden="true">lock</i> pro</span>
-                  </small>
-                )}
+                {carbonIntensityDomain === CARBON_INTENSITY_DOMAIN.ENERGY ? (
+                  <React.Fragment>
+                    {null && <div className="loading overlay" />}
+                    <span className="country-history-title">
+                      {tableDisplayEmissions
+                        ? __(`country-history.emissions${electricityMixMode === 'consumption' ? 'origin' : 'production'}24h`)
+                        : `Energy mix (${electricityMixMode !== 'consumption' ? 'territorial' : 'incl. imported'})`
+                      }
+                    </span>
+                    {null && (
+                      <small className="small-screen-hidden">
+                        <i className="material-icons" aria-hidden="true">file_download</i> <a href="https://data.electricitymap.org/?utm_source=electricitymap.org&utm_medium=referral&utm_campaign=country_panel" target="_blank">{__('country-history.Getdata')}</a>
+                        <span className="pro"><i className="material-icons" aria-hidden="true">lock</i> pro</span>
+                      </small>
+                    )}
+                    <CountryHistoryMixGraph />
+                    <br />
+                    <div className="bysource">
+                      {__('country-panel.bysource')}
+                    </div>
+                    <CountryTable />
+                  </React.Fragment>
+                ) : null}
 
-                <CountryHistoryMixGraph />
+                {carbonIntensityDomain === CARBON_INTENSITY_DOMAIN.GDP ? (
+                  <React.Fragment>
+                    {null && <div className="loading overlay" />}
+                    <span className="country-history-title">
+                      Gross domestic product
+                    </span>
+                    <CountryHistoryGdpGraph />
+                  </React.Fragment>
+                ) : null}
 
-                {null && <div className="loading overlay" />}
-                <span className="country-history-title">
-                  Gross domestic product
-                </span>
-
-                <CountryHistoryGdpGraph />
-
-                <span className="country-history-title">
-                  Population
-                </span>
-
-                <CountryHistoryPopulationGraph />
+                {carbonIntensityDomain === CARBON_INTENSITY_DOMAIN.POPULATION ? (
+                  <React.Fragment>
+                    <span className="country-history-title">
+                      Population
+                    </span>
+                    <CountryHistoryPopulationGraph />
+                  </React.Fragment>
+                ) : null}
               </div>
               <hr />
               <div>

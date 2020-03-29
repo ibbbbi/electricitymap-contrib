@@ -67,10 +67,13 @@
     background-image: url(../images/language_select.svg);
 }
 
-.prodcons-toggle-container {
+.controls-container {
     position: absolute;
     top: 70px;
     right: 16px;
+}
+
+.prodcons-toggle-container {
     border: none;
     outline: none;
     box-sizing: border-box;
