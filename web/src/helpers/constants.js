@@ -16,7 +16,7 @@ const modeColor = {
 };
 const modeOrder = [
   'nuclear',
-  'geothermal',
+  // 'geothermal',
   'biomass',
   'coal',
   'wind',

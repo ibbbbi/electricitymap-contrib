@@ -71,6 +71,7 @@ const CountryPanelProductionTooltip = ({
       ? (displayByEmissions ? 'emissionsStoredUsing' : 'electricityStoredUsing')
       : (displayByEmissions ? 'emissionsComeFrom' : 'electricityComesFrom'),
     getRatioPercent(usage, totalElectricity),
+    electricityMixMode === 'consumption' ? 'consumed' : 'produced',
     getFullZoneName(countryCode),
     __(mode)
   ));

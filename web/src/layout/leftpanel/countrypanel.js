@@ -220,7 +220,7 @@ class Component extends React.PureComponent {
                     <span className="country-history-title">
                       {tableDisplayEmissions
                         ? __(`country-history.emissions${electricityMixMode === 'consumption' ? 'origin' : 'production'}24h`)
-                        : `Energy mix (${electricityMixMode !== 'consumption' ? 'territorial' : 'incl. imported'})`
+                        : `Energy ${electricityMixMode}`
                       }
                     </span>
                     {null && (

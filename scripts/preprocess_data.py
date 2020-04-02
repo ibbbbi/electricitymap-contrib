@@ -232,6 +232,7 @@ bp_sheet_mapping = {
     'Hydro Consumption - Mtoe': {'key': 'primaryEnergyConsumptionTWh.hydro', 'convert': convert_mtoe_to_twh},
     'Solar Consumption - Mtoe': {'key': 'primaryEnergyConsumptionTWh.solar', 'convert': convert_mtoe_to_twh},
     'Wind Consumption - Mtoe': {'key': 'primaryEnergyConsumptionTWh.wind', 'convert': convert_mtoe_to_twh},
+    'Geo Biomass Other - Mtoe': {'key': 'primaryEnergyConsumptionTWh.biomass', 'convert': convert_mtoe_to_twh},
 
     'Oil Production - Tonnes': {'key': 'primaryEnergyProductionTWh.oil', 'convert': convert_mtoe_to_twh},
     'Gas Production - Mtoe': {'key': 'primaryEnergyProductionTWh.gas', 'convert': convert_mtoe_to_twh},
@@ -240,12 +241,13 @@ bp_sheet_mapping = {
     'Hydro Generation - TWh': {'key': 'primaryEnergyProductionTWh.hydro'},
     'Solar Generation - TWh': {'key': 'primaryEnergyProductionTWh.solar'},
     'Wind Generation - TWh ': {'key': 'primaryEnergyProductionTWh.wind'},
+    'Geo Biomass Other - TWh': {'key': 'primaryEnergyProductionTWh.biomass'}
 
-    ## TODO: Add geothermal, biomass & others + biofuels
+    ## TODO: Add biofuels
+    ## TODO: Rename biomass to geoAndBiomass
+    ## TODO: Energy consumption doesn't take into account cross-border import
 }
 """
-'Geo Biomass Other - TWh' = Renewables: Generation- Geothermal, Biomass and Other
-'Geo Biomass Other - Mtoe' = Renewables: Consumption - Geothermal, Biomass and Other*
 'Biofuels Production - Kboed' = Renewable energy -  Biofuels production
 'Biofuels Production - Ktoe' = Renewable energy -  Biofuels production
 """
