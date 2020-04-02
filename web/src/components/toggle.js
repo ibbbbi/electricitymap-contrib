@@ -75,7 +75,7 @@ const InfoButton = styled.div`
   }
 `;
 
-const Toggle = ({
+export default ({
   className,
   infoHTML,
   onChange,
@@ -84,15 +84,11 @@ const Toggle = ({
 }) => {
   const [tooltipVisible, setTooltipVisible] = useState(false);
 
-  const activeIndex = findIndex(options, { value });
-  const nextIndex = (activeIndex + 1) % options.length;
-  const nextValue = options[nextIndex].value;
-
   return (
     <Wrapper className={className}>
-      <Options onClick={() => onChange(nextValue)}>
+      <Options>
         {options.map(o => (
-          <OptionItem key={o.value} active={o.value === value}>
+          <OptionItem key={o.value} active={o.value === value} onClick={() => onChange(o.value)}>
             {o.label}
           </OptionItem>
         ))}
@@ -110,5 +106,3 @@ const Toggle = ({
     </Wrapper>
   );
 };
-
-export default Toggle;
