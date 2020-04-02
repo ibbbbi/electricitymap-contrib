@@ -1,7 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 
-import { MAP_COUNTRY_TOOLTIP_KEY } from '../../helpers/constants';
+import { MAP_COUNTRY_TOOLTIP_KEY, CARBON_INTENSITY_DOMAIN } from '../../helpers/constants';
 import { __, getFullZoneName } from '../../helpers/translation';
 import { getCo2Scale } from '../../helpers/scales';
 import { co2Sub, formatCarbonIntensityShortUnit } from '../../helpers/formatting';
@@ -73,22 +73,26 @@ const MapCountryTooltip = ({
                   dangerouslySetInnerHTML={{ __html: co2Sub(__('country-panel.carbonintensity')) }}
                 />
               </div>
-              <div className="country-col country-lowcarbon-wrap">
-                <div id="tooltip-country-lowcarbon-gauge" className="country-gauge-wrap">
-                  <CircularGauge percentage={lowcarbonPercentage} />
-                </div>
-                <div
-                  className="country-col-headline"
-                  dangerouslySetInnerHTML={{ __html: co2Sub(__('country-panel.lowcarbon')) }}
-                />
-                <div className="country-col-subtext" />
-              </div>
-              <div className="country-col country-renewable-wrap">
-                <div id="tooltip-country-renewable-gauge" className="country-gauge-wrap">
-                  <CircularGauge percentage={renewablePercentage} />
-                </div>
-                <div className="country-col-headline">{__('country-panel.renewable')}</div>
-              </div>
+              {carbonIntensityDomain == CARBON_INTENSITY_DOMAIN.ENERGY ? (
+                <React.Fragment>
+                  <div className="country-col country-lowcarbon-wrap">
+                    <div id="tooltip-country-lowcarbon-gauge" className="country-gauge-wrap">
+                      <CircularGauge percentage={lowcarbonPercentage} />
+                    </div>
+                    <div
+                      className="country-col-headline"
+                      dangerouslySetInnerHTML={{ __html: co2Sub(__('country-panel.lowcarbon')) }}
+                    />
+                    <div className="country-col-subtext" />
+                  </div>
+                  <div className="country-col country-renewable-wrap">
+                    <div id="tooltip-country-renewable-gauge" className="country-gauge-wrap">
+                      <CircularGauge percentage={renewablePercentage} />
+                    </div>
+                    <div className="country-col-headline">{__('country-panel.renewable')}</div>
+                  </div>
+                </React.Fragment>
+              ) : null}
             </div>
           </div>
         ) : (

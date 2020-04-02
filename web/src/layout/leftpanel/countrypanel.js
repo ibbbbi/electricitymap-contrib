@@ -149,28 +149,32 @@ class Component extends React.PureComponent {
                     )
                   </div>
                 </div>
-                <div className="country-col country-lowcarbon-wrap">
-                  <div id="country-lowcarbon-gauge" className="country-gauge-wrap">
-                    <CountryLowCarbonGauge
-                      onMouseMove={showLowCarbonInfoTooltip}
-                      onMouseOut={hideLowCarbonInfoTooltip}
-                    />
-                  </div>
-                  <div
-                    className="country-col-headline"
-                    dangerouslySetInnerHTML={{ __html: co2Sub(__('country-panel.lowcarbon')) }}
-                  />
-                  <div className="country-col-subtext" />
-                </div>
-                <div className="country-col country-renewable-wrap">
-                  <div id="country-renewable-gauge" className="country-gauge-wrap">
-                    <CountryRenewableGauge />
-                  </div>
-                  <div
-                    className="country-col-headline"
-                    dangerouslySetInnerHTML={{ __html: co2Sub(__('country-panel.renewable')) }}
-                  />
-                </div>
+                { carbonIntensityDomain == CARBON_INTENSITY_DOMAIN.ENERGY ? (
+                  <React.Fragment>
+                    <div className="country-col country-lowcarbon-wrap">
+                      <div id="country-lowcarbon-gauge" className="country-gauge-wrap">
+                        <CountryLowCarbonGauge
+                          onMouseMove={showLowCarbonInfoTooltip}
+                          onMouseOut={hideLowCarbonInfoTooltip}
+                        />
+                      </div>
+                      <div
+                        className="country-col-headline"
+                        dangerouslySetInnerHTML={{ __html: co2Sub(__('country-panel.lowcarbon')) }}
+                      />
+                      <div className="country-col-subtext" />
+                    </div>
+                    <div className="country-col country-renewable-wrap">
+                      <div id="country-renewable-gauge" className="country-gauge-wrap">
+                        <CountryRenewableGauge />
+                      </div>
+                      <div
+                        className="country-col-headline"
+                        dangerouslySetInnerHTML={{ __html: co2Sub(__('country-panel.renewable')) }}
+                      />
+                    </div>
+                  </React.Fragment>
+                ) : null}
               </div>
               <div className="country-show-emissions-wrap">
                 <div className="menu">
@@ -227,9 +231,14 @@ class Component extends React.PureComponent {
                     )}
                     <CountryHistoryMixGraph />
                     <br />
-                    <div className="bysource">
-                      {__('country-panel.bysource')}
-                    </div>
+                    {null && (
+                      <div className="bysource">
+                        {__('country-panel.bysource')}
+                      </div>
+                    )}
+                    <span className="country-history-title">
+                      by source
+                    </span>
                     <CountryTable />
                   </React.Fragment>
                 ) : null}
