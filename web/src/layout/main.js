@@ -59,28 +59,27 @@ const Main = ({ brightModeEnabled, electricityMixMode, isLeftPanelCollapsed, car
             </a>
           </div>
           <Legend />
-          <Toggle
-            className="production-consumption-toggle"
-            infoHTML={__('tooltips.cpinfo')}
-            onChange={value => dispatchApplication('electricityMixMode', value)}
-            options={[
-              { value: 'production', label: __('tooltips.production') },
-              { value: 'consumption', label: __('tooltips.consumption') },
-            ]}
-            value={electricityMixMode}
-          />
-          <Toggle
-            className="production-consumption-toggle"
-            onChange={value => dispatchApplication('carbonIntensityDomain', value)}
-            options={[
-              [
+          <div className="controls-container">
+            <Toggle
+              infoHTML={__('tooltips.cpinfo')}
+              onChange={value => dispatchApplication('electricityMixMode', value)}
+              options={[
+                { value: 'production', label: __('tooltips.production') },
+                { value: 'consumption', label: __('tooltips.consumption') },
+              ]}
+              value={electricityMixMode}
+            />
+            <br />
+            <Toggle
+              onChange={value => dispatchApplication('carbonIntensityDomain', value)}
+              options={[
                 { value: CARBON_INTENSITY_DOMAIN.POPULATION, label: 'population' },
                 { value: CARBON_INTENSITY_DOMAIN.GDP, label: 'gdp' },
                 { value: CARBON_INTENSITY_DOMAIN.ENERGY, label: 'energy' },
-              ]
-            ]}
-            value={carbonIntensityDomain}
-          />
+              ]}
+              value={carbonIntensityDomain}
+            />
+          </div>
           <LayerButtons />
         </div>
 
