@@ -58,6 +58,7 @@ country_mapping['Tanzania'] = 'TZ'
 country_mapping['USA'] = 'US'
 country_mapping['Venezuela'] = 'VE'
 country_mapping['Wallis and Futuna Islands'] = 'WF'
+country_mapping['Republic of Congo '] = 'CD'
 
 
 def get_country_iso2(country_name):
@@ -222,7 +223,7 @@ bp_sheet_mapping = {
     # sheet -> field path
     'Primary Energy Consumption': {'key': 'totalPrimaryEnergyConsumptionTWh', 'convert': convert_mtoe_to_twh},
     'Electricity Generation ': {'key': 'totalElectricityGenerationTWh'},
-    # TODO: Add total primary energy production
+    # Note: total primary energy production is not directly accessible
 
     'Oil Consumption - Mtoe': {'key': 'primaryEnergyConsumptionTWh.oil', 'convert': convert_mtoe_to_twh},
     'Gas Consumption - Mtoe': {'key': 'primaryEnergyConsumptionTWh.gas', 'convert': convert_mtoe_to_twh},
@@ -232,7 +233,7 @@ bp_sheet_mapping = {
     'Solar Consumption - Mtoe': {'key': 'primaryEnergyConsumptionTWh.solar', 'convert': convert_mtoe_to_twh},
     'Wind Consumption - Mtoe': {'key': 'primaryEnergyConsumptionTWh.wind', 'convert': convert_mtoe_to_twh},
 
-    # TODO: Add oil prod
+    'Oil Production - Tonnes': {'key': 'primaryEnergyProductionTWh.oil', 'convert': convert_mtoe_to_twh},
     'Gas Production - Mtoe': {'key': 'primaryEnergyProductionTWh.gas', 'convert': convert_mtoe_to_twh},
     'Coal Production - Mtoe': {'key': 'primaryEnergyProductionTWh.coal', 'convert': convert_mtoe_to_twh},
     'Nuclear Generation - TWh': {'key': 'primaryEnergyProductionTWh.nuclear'},
@@ -242,6 +243,12 @@ bp_sheet_mapping = {
 
     ## TODO: Add geothermal, biomass & others + biofuels
 }
+"""
+'Geo Biomass Other - TWh' = Renewables: Generation- Geothermal, Biomass and Other
+'Geo Biomass Other - Mtoe' = Renewables: Consumption - Geothermal, Biomass and Other*
+'Biofuels Production - Kboed' = Renewable energy -  Biofuels production
+'Biofuels Production - Ktoe' = Renewable energy -  Biofuels production
+"""
 for sheet_name in bp_sheet_mapping.keys():
     print(f'Reading BP {sheet_name}..')
     df_bp = pd.read_excel(
@@ -261,7 +268,7 @@ for sheet_name in bp_sheet_mapping.keys():
         'Eastern Africa',
         'Middle Africa',
         'Western Africa',
-    ] or 'Total' in k or 'Other' in k or 'OECD' in k or 'European Union' in k)
+    ] or 'Total' in k or 'Other' in k or 'OECD' in k or 'European Union' in k or 'OPEC' in k)
     df_bp = df_bp.loc[~to_drop]
     # Melt
     df_bp = df_bp.melt(
@@ -290,7 +297,15 @@ for country_iso2, country_data in obj.items():
 
         # Compute totals if not already present
         if 'totalPrimaryEnergyProductionTWh' not in v and 'primaryEnergyProductionTWh' in v:
-            v['totalPrimaryEnergyProductionTWh'] = sum([d for d in v['primaryEnergyProductionTWh'].values()])
+           v['totalPrimaryEnergyProductionTWh'] = sum([d for d in v['primaryEnergyProductionTWh'].values()])
+
+        # do checks
+        if 'totalPrimaryEnergyProductionTWh' in v and 'primaryEnergyProductionTWh' in v:
+            Z = sum([d for d in v['primaryEnergyProductionTWh'].values()])
+            #print('totalPrimaryEnergyProduction', abs(Z - v['totalPrimaryEnergyProductionTWh']))
+        if 'totalPrimaryEnergyConsumptionTWh' in v and 'primaryEnergyConsumptionTWh' in v:
+            Z = sum([d for d in v['primaryEnergyConsumptionTWh'].values()])
+            #print('primaryEnergyConsumption', abs(Z - v['totalPrimaryEnergyConsumptionTWh']))
 
         if 'totalFootprintMegatonsCO2' in v and 'populationMillions' in v:
             v['totalFootprintTonsCO2PerCapita'] = v['totalFootprintMegatonsCO2'] / v['populationMillions']
