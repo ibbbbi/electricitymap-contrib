@@ -10,24 +10,27 @@ import Header from './header';
 import LayerButtons from './layerbuttons';
 import LeftPanel from './leftpanel';
 import Legend from './legend';
-import ProdConsToggle from './prodconstoggle';
-import DomainToggle from './domaintoggle';
 import Tabs from './tabs';
 import Tooltips from './tooltips';
 
 // Modules
 import { __ } from '../helpers/translation';
+import { dispatchApplication } from '../store';
 import OnboardingModal from '../components/onboardingmodal';
+import Toggle from '../components/toggle';
+import { CARBON_INTENSITY_DOMAIN } from '../helpers/constants';
 
 // TODO: Move all styles from styles.css to here
 // TODO: Remove all unecessary id and class tags
 
 const mapStateToProps = state => ({
   brightModeEnabled: state.application.brightModeEnabled,
+  electricityMixMode: state.application.electricityMixMode,
   isLeftPanelCollapsed: state.application.isLeftPanelCollapsed,
+  carbonIntensityDomain: state.application.carbonIntensityDomain,
 });
 
-export default connect(mapStateToProps)(props => (
+const Main = ({ brightModeEnabled, electricityMixMode, isLeftPanelCollapsed, carbonIntensityDomain }) => (
   <React.Fragment>
     <div
       style={{
@@ -45,7 +48,9 @@ export default connect(mapStateToProps)(props => (
         <LeftPanel />
         <div id="map-container">
           <div id="zones" className="map-layer" />
-          <div id="watermark" className={`watermark small-screen-hidden ${props.brightModeEnabled ? 'brightmode' : ''}`}>
+          <canvas id="wind" className="map-layer" />
+          <canvas id="solar" className="map-layer" />
+          <div id="watermark" className={`watermark small-screen-hidden ${brightModeEnabled ? 'brightmode' : ''}`}>
             <a href="http://www.tmrow.com/mission?utm_source=electricitymap.org&utm_medium=referral&utm_campaign=watermark" target="_blank">
               <div id="built-by-tomorrow" />
             </a>
@@ -54,11 +59,28 @@ export default connect(mapStateToProps)(props => (
             </a>
           </div>
           <Legend />
-          <div className="controls-container">
-            <ProdConsToggle />
-            <br />
-            <DomainToggle />
-          </div>
+          <Toggle
+            className="production-consumption-toggle"
+            infoHTML={__('tooltips.cpinfo')}
+            onChange={value => dispatchApplication('electricityMixMode', value)}
+            options={[
+              { value: 'production', label: __('tooltips.production') },
+              { value: 'consumption', label: __('tooltips.consumption') },
+            ]}
+            value={electricityMixMode}
+          />
+          <Toggle
+            className="production-consumption-toggle"
+            onChange={value => dispatchApplication('carbonIntensityDomain', value)}
+            options={[
+              [
+                { value: CARBON_INTENSITY_DOMAIN.POPULATION, label: 'population' },
+                { value: CARBON_INTENSITY_DOMAIN.GDP, label: 'gdp' },
+                { value: CARBON_INTENSITY_DOMAIN.ENERGY, label: 'energy' },
+              ]
+            ]}
+            value={carbonIntensityDomain}
+          />
           <LayerButtons />
         </div>
 
@@ -86,7 +108,7 @@ export default connect(mapStateToProps)(props => (
 
         <div
           id="left-panel-collapse-button"
-          className={`small-screen-hidden ${props.isLeftPanelCollapsed ? 'collapsed' : ''}`}
+          className={`small-screen-hidden ${isLeftPanelCollapsed ? 'collapsed' : ''}`}
           role="button"
           tabIndex="0"
         >
@@ -100,4 +122,6 @@ export default connect(mapStateToProps)(props => (
     <Tooltips />
     <OnboardingModal />
   </React.Fragment>
-));
+);
+
+export default connect(mapStateToProps)(Main);
